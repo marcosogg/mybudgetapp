@@ -196,7 +196,7 @@ export type Database = {
           category_id: string | null
           created_at: string | null
           date: string
-          description: string
+          description: string | null
           id: string
           tags: string[] | null
           user_id: string
@@ -206,7 +206,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string | null
           date: string
-          description: string
+          description?: string | null
           id?: string
           tags?: string[] | null
           user_id: string
@@ -216,7 +216,7 @@ export type Database = {
           category_id?: string | null
           created_at?: string | null
           date?: string
-          description?: string
+          description?: string | null
           id?: string
           tags?: string[] | null
           user_id?: string
