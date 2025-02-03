@@ -10,6 +10,7 @@ import { Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/components/ui/use-toast";
+import { MonthPicker } from "@/components/budget/MonthPicker";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -88,14 +89,22 @@ const Index = () => {
         </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <BudgetSummaryCard />
-        <IncomeSummaryCard />
-        <TransactionSummaryCard 
-          count={transactionStats?.count || 0}
-          total={transactionStats?.total || 0}
-        />
-      </div>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardTitle className="text-base font-medium">Period Overview</CardTitle>
+          <MonthPicker />
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <BudgetSummaryCard />
+            <IncomeSummaryCard />
+            <TransactionSummaryCard 
+              count={transactionStats?.count || 0}
+              total={transactionStats?.total || 0}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         <BudgetComparisonChart />
