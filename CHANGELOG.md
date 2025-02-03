@@ -18,6 +18,8 @@
 - Redesigned Monthly Budget card with improved visual hierarchy and progress tracking
 - Enhanced budget progress visualization with new progress bar design
 - Improved number formatting and accessibility in budget display
+- Added over-budget indicator with color changes and warning icon
+- Enhanced accessibility for budget status indicators
 
 ### Technical Details
 - Created pure calculation functions for better testability
@@ -27,3 +29,4 @@
 - Improved responsive layout handling
 - Added ARIA labels for better accessibility
 - Enhanced number formatting for better readability
+- Implemented visual indicators for over-budget status
