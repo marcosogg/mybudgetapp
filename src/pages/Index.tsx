@@ -16,23 +16,33 @@ const Index = () => {
   const { toast } = useToast();
 
   // Fetch recent transaction count and total
-  const { data: transactionStats } = useQuery({
+  const { data: transactionStats, error: transactionError } = useQuery({
     queryKey: ['transactionStats'],
     queryFn: async () => {
+      console.log('Starting transaction stats query...');
+      
       const { data: session } = await supabase.auth.getSession();
+      console.log('Auth session:', session?.session ? 'exists' : 'null');
+      
       if (!session?.session?.user) {
+        console.error('No authenticated user found');
         throw new Error('User not authenticated');
       }
+
+      const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+      const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString();
+      
+      console.log('Date range:', { startOfMonth, endOfMonth });
 
       const { data, error } = await supabase
         .from('transactions')
         .select('amount')
         .eq('user_id', session.session.user.id)
-        .gte('date', new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString())
-        .lte('date', new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString());
+        .gte('date', startOfMonth)
+        .lte('date', endOfMonth);
 
       if (error) {
-        console.error('Error fetching transaction stats:', error);
+        console.error('Supabase query error:', error);
         toast({
           variant: "destructive",
           title: "Error",
@@ -41,12 +51,23 @@ const Index = () => {
         throw error;
       }
 
-      return {
+      console.log('Retrieved transactions:', data?.length || 0);
+      console.log('Transaction data:', data);
+
+      const stats = {
         count: data?.length || 0,
         total: data?.reduce((sum, t) => sum + (t.amount < 0 ? Math.abs(t.amount) : 0), 0) || 0
       };
+
+      console.log('Calculated stats:', stats);
+      return stats;
     },
+    retry: false
   });
+
+  if (transactionError) {
+    console.error('Transaction query error:', transactionError);
+  }
 
   return (
     <div className="space-y-8">

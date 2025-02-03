@@ -6,6 +6,8 @@ interface TransactionSummaryCardProps {
 }
 
 export function TransactionSummaryCard({ count, total }: TransactionSummaryCardProps) {
+  console.log('TransactionSummaryCard rendered with:', { count, total });
+  
   return (
     <Card>
       <CardHeader>
