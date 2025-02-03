@@ -15,6 +15,9 @@
 - Improved type safety for budget calculations
 - Updated dashboard layout to group summary cards under a period overview
 - Integrated month picker with existing MonthContext
+- Redesigned Monthly Budget card with improved visual hierarchy and progress tracking
+- Enhanced budget progress visualization with new progress bar design
+- Improved number formatting and accessibility in budget display
 
 ### Technical Details
 - Created pure calculation functions for better testability
@@ -22,3 +25,5 @@
 - Centralized budget calculation logic to reduce code duplication
 - Enhanced dashboard component organization
 - Improved responsive layout handling
+- Added ARIA labels for better accessibility
+- Enhanced number formatting for better readability
