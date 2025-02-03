@@ -2,11 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
-export function useTransactionStats() {
+export function useTransactionStats(selectedMonth: Date) {
   const { toast } = useToast();
 
   return useQuery({
-    queryKey: ['transactionStats'],
+    queryKey: ['transactionStats', selectedMonth.toISOString()],
     queryFn: async () => {
       console.log('Starting transaction stats query...');
       
@@ -18,8 +18,8 @@ export function useTransactionStats() {
         throw new Error('User not authenticated');
       }
 
-      const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
-      const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString();
+      const startOfMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth(), 1).toISOString();
+      const endOfMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0).toISOString();
       
       console.log('Date range:', { startOfMonth, endOfMonth });
 

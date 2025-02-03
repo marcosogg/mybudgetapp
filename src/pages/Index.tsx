@@ -3,9 +3,11 @@ import { PeriodOverviewCard } from "@/components/dashboard/PeriodOverviewCard";
 import { ChartsSection } from "@/components/dashboard/ChartsSection";
 import { UpcomingReminders } from "@/components/reminders/UpcomingReminders";
 import { useTransactionStats } from "@/hooks/dashboard/useTransactionStats";
+import { useMonth } from "@/contexts/MonthContext";
 
 const Index = () => {
-  const { data: transactionStats, error: transactionError } = useTransactionStats();
+  const { selectedMonth } = useMonth();
+  const { data: transactionStats, error: transactionError } = useTransactionStats(selectedMonth);
 
   if (transactionError) {
     console.error('Transaction query error:', transactionError);
