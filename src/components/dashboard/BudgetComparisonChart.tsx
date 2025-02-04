@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
 import { useMonthlyBudgetComparison } from "@/hooks/budget/useMonthlyBudgetComparison";
-import { format, startOfYear, addMonths } from "date-fns";
+import { format, subMonths } from "date-fns";
+import { useMonth } from "@/contexts/MonthContext";
 
 const chartConfig = {
   planned: {
@@ -17,8 +18,9 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function BudgetComparisonChart() {
-  const startDate = startOfYear(new Date(2025, 0, 1));
-  const endDate = addMonths(startDate, 5);
+  const { selectedMonth } = useMonth();
+  const startDate = subMonths(selectedMonth, 2);
+  const endDate = selectedMonth;
   
   const { data: comparison } = useMonthlyBudgetComparison();
 
@@ -28,8 +30,8 @@ export function BudgetComparisonChart() {
     actual: item.actual_total,
   }))?.sort((a, b) => {
     // Sort months chronologically
-    const monthA = new Date(Date.parse(`${a.month} 1, 2025`));
-    const monthB = new Date(Date.parse(`${b.month} 1, 2025`));
+    const monthA = new Date(Date.parse(`${a.month} 1, ${selectedMonth.getFullYear()}`));
+    const monthB = new Date(Date.parse(`${b.month} 1, ${selectedMonth.getFullYear()}`));
     return monthA.getTime() - monthB.getTime();
   }) || [];
 
