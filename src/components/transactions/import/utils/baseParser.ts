@@ -14,7 +14,33 @@ export interface StatementParser {
 
 export const formatDate = (dateStr: string): string | null => {
   if (!dateStr?.trim()) return null;
-  const date = new Date(dateStr);
-  if (isNaN(date.getTime())) return null;
-  return date.toISOString().split('T')[0];
+  
+  // Try different date formats
+  const formats = [
+    // ISO format
+    (str: string) => new Date(str),
+    // DD/MM/YYYY
+    (str: string) => {
+      const [day, month, year] = str.split('/');
+      return new Date(`${year}-${month}-${day}`);
+    },
+    // DD-MM-YYYY
+    (str: string) => {
+      const [day, month, year] = str.split('-');
+      return new Date(`${year}-${month}-${day}`);
+    }
+  ];
+
+  for (const format of formats) {
+    try {
+      const date = format(dateStr);
+      if (!isNaN(date.getTime())) {
+        return date.toISOString().split('T')[0];
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
 };

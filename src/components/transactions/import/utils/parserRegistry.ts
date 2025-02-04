@@ -10,5 +10,12 @@ const parsers: Record<StatementFormat, StatementParser> = {
 };
 
 export const getParser = (format: StatementFormat): StatementParser => {
-  return parsers[format];
+  return parsers[format] || RevolutParser;
+};
+
+export const detectFormat = (headers: string[]): StatementFormat => {
+  if (WiseParser.validateHeaders(headers)) {
+    return "wise";
+  }
+  return "revolut";
 };
