@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { format } from "date-fns";
+import { format, endOfYear } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useReminders } from "@/hooks/reminders/useReminders";
@@ -7,12 +7,11 @@ import { ReminderCard } from "./ReminderCard";
 
 export function CalendarView() {
   const [date, setDate] = useState<Date>(new Date());
-  const { data: reminders } = useReminders();
+  // Fetch reminders up to end of year to show future recurring reminders
+  const { data: reminders } = useReminders('active', endOfYear(new Date()));
 
-  const selectedDateReminders = reminders?.filter(
-    (reminder) =>
-      format(new Date(reminder.due_date), "yyyy-MM-dd") ===
-      format(date, "yyyy-MM-dd")
+  const selectedDateReminders = reminders?.filter((reminder) =>
+    format(new Date(reminder.due_date), "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
   );
 
   return (
@@ -55,7 +54,7 @@ export function CalendarView() {
             </p>
           ) : (
             selectedDateReminders.map((reminder) => (
-              <ReminderCard key={reminder.id} reminder={reminder} />
+              <ReminderCard key={`${reminder.id}-${reminder.due_date}`} reminder={reminder} />
             ))
           )}
         </CardContent>

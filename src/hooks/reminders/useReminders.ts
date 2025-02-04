@@ -1,47 +1,53 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Reminder } from "@/types/reminder";
-import { endOfMonth, format, startOfMonth } from "date-fns";
+import { endOfMonth, format, isSameDay, startOfMonth, addMonths, isAfter, isBefore } from "date-fns";
 
-export function useReminders(status: 'active' | 'archived' = 'active') {
+export function useReminders(status: 'active' | 'archived' = 'active', endDate?: Date) {
   return useQuery({
-    queryKey: ["reminders", status],
+    queryKey: ["reminders", status, endDate?.toISOString()],
     queryFn: async () => {
       const today = new Date();
       const monthStart = startOfMonth(today);
-      const monthEnd = endOfMonth(today);
+      const queryEndDate = endDate || endOfMonth(today);
 
-      // Fetch base reminders
       const { data: baseReminders, error } = await supabase
         .from("reminders")
         .select("*")
         .eq("status", status)
-        .or(`is_recurring.eq.false,and(is_recurring.eq.true,due_date.gte.${format(monthStart, 'yyyy-MM-dd')})`)
         .order("due_date", { ascending: true });
 
       if (error) throw error;
 
-      // Process recurring reminders
-      const reminders = baseReminders.map((reminder) => {
+      // Process reminders and generate recurring instances
+      const processedReminders = baseReminders.flatMap((reminder) => {
         const typedReminder = reminder as Reminder;
-        
-        if (!typedReminder.is_recurring) return typedReminder;
-
-        // For recurring reminders, adjust the due date to current month if needed
         const reminderDate = new Date(typedReminder.due_date);
-        if (reminderDate < monthStart) {
-          return {
-            ...typedReminder,
-            due_date: format(
-              new Date(today.getFullYear(), today.getMonth(), reminderDate.getDate()),
-              'yyyy-MM-dd'
-            ),
-          };
+        const results: Reminder[] = [];
+
+        if (!typedReminder.is_recurring) {
+          // For non-recurring reminders, only include if within range
+          if (!isAfter(reminderDate, queryEndDate) && !isBefore(reminderDate, monthStart)) {
+            results.push(typedReminder);
+          }
+        } else {
+          // For recurring reminders, generate instances for each month in range
+          let currentDate = reminderDate;
+          while (!isAfter(currentDate, queryEndDate)) {
+            if (!isBefore(currentDate, monthStart)) {
+              results.push({
+                ...typedReminder,
+                due_date: format(currentDate, 'yyyy-MM-dd'),
+              });
+            }
+            currentDate = addMonths(currentDate, 1);
+          }
         }
-        return typedReminder;
+
+        return results;
       });
 
-      return reminders;
+      return processedReminders;
     },
   });
 }
