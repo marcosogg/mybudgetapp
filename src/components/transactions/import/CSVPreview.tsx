@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText } from "lucide-react";
-import { ParsedTransaction } from "./utils/transactionParser";
+import { ParsedTransaction } from "./utils/baseParser";
 
 interface CSVPreviewProps {
   headers: string[];
