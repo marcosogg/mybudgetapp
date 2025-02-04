@@ -4,6 +4,7 @@ import { BudgetComparisonChart } from "./BudgetComparisonChart";
 import { Button } from "@/components/ui/button";
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { cn } from "@/lib/utils";
+import { SavingsChart } from "./SavingsChart";
 
 const InsightItem = ({ content }: { content: string }) => {
   const isPositive = content.toLowerCase().includes('under') || 
@@ -78,12 +79,12 @@ export function ChartsSection() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div className="space-y-1">
-            <CardTitle>Savings</CardTitle>
-            <CardDescription>Stay on top of your financial deadlines</CardDescription>
+            <CardTitle>Savings Trend</CardTitle>
+            <CardDescription>Monthly savings progress</CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="min-h-[350px] flex items-center justify-center">
-          <p className="text-muted-foreground text-lg">Coming Soon</p>
+        <CardContent>
+          <SavingsChart />
         </CardContent>
       </Card>
     </div>
