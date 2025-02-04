@@ -6,22 +6,50 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
 
 export default function Settings() {
   const { profile, updateIncome } = useProfile();
   const navigate = useNavigate();
+  const [showFormatDialog, setShowFormatDialog] = useState(false);
+  const [pendingFormat, setPendingFormat] = useState<"revolut" | "wise" | null>(null);
 
   const handleFormatChange = async (format: "revolut" | "wise") => {
+    setPendingFormat(format);
+    setShowFormatDialog(true);
+  };
+
+  const handleConfirmFormatChange = async () => {
+    if (!pendingFormat) return;
+
     try {
       await updateIncome.mutateAsync({
         salary: profile?.salary || 0,
         bonus: profile?.bonus || 0,
-        statement_format: format,
+        statement_format: pendingFormat,
       });
       toast.success("Statement format updated successfully");
     } catch (error) {
       toast.error("Failed to update statement format");
+    } finally {
+      setShowFormatDialog(false);
+      setPendingFormat(null);
     }
+  };
+
+  const handleCancelFormatChange = () => {
+    setShowFormatDialog(false);
+    setPendingFormat(null);
   };
 
   return (
@@ -65,6 +93,26 @@ export default function Settings() {
           </div>
         </RadioGroup>
       </Card>
+
+      <AlertDialog open={showFormatDialog} onOpenChange={setShowFormatDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Change Statement Format?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will change how your CSV files are processed during import.
+              Make sure your future statement downloads match the selected format.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelFormatChange}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmFormatChange}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
