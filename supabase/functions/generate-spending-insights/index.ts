@@ -18,7 +18,6 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Get user from auth header
     const authHeader = req.headers.get('Authorization')?.split(' ')[1];
     if (!authHeader) {
       throw new Error('No authorization header');
@@ -29,64 +28,49 @@ serve(async (req) => {
       throw new Error('Invalid token');
     }
 
-    // Fetch recent transactions and budget data
-    const { data: transactions } = await supabase
-      .from('transactions')
-      .select('amount, description, category:categories(name)')
-      .eq('user_id', user.id)
-      .order('date', { ascending: false })
-      .limit(50);
+    // Get current month's data
+    const currentDate = new Date();
+    const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
+    // Fetch budget comparison data
     const { data: budgetComparison } = await supabase
       .rpc('get_budget_comparison', {
         p_user_id: user.id,
-        p_period: new Date().toISOString(),
+        p_period: startOfMonth.toISOString(),
       });
 
-    // Prepare data for AI analysis
-    const transactionSummary = transactions?.map(t => ({
-      amount: t.amount,
-      description: t.description,
-      category: t.category?.name,
-    }));
+    // Calculate total budget and spending
+    const totalBudget = budgetComparison?.reduce((sum, item) => sum + Number(item.planned_amount), 0) || 0;
+    const totalSpent = budgetComparison?.reduce((sum, item) => sum + Number(item.actual_amount), 0) || 0;
+    
+    // Find most overspent category
+    const overspentCategories = budgetComparison
+      ?.filter(item => item.actual_amount > item.planned_amount)
+      .sort((a, b) => (b.actual_amount - b.planned_amount) - (a.actual_amount - a.planned_amount));
+    
+    const mostOverspentCategory = overspentCategories?.[0];
 
-    const budgetSummary = budgetComparison?.map(b => ({
-      category: b.category_name,
-      planned: b.planned_amount,
-      actual: b.actual_amount,
-      variance: b.variance,
-    }));
+    // Generate focused insights
+    const insights = [];
 
-    // Generate insights using OpenAI
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${Deno.env.get('OPENAI_API_KEY')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a financial advisor analyzing spending patterns and budget data. Provide 3 concise, actionable insights based on the data. Focus on areas of overspending, potential savings, and spending patterns. Keep each insight to 1-2 sentences.',
-          },
-          {
-            role: 'user',
-            content: JSON.stringify({
-              transactions: transactionSummary,
-              budgets: budgetSummary,
-            }),
-          },
-        ],
-      }),
-    });
+    // Overall budget status
+    const budgetPercentage = (totalSpent / totalBudget) * 100;
+    if (budgetPercentage > 100) {
+      insights.push(`You're ${(budgetPercentage - 100).toFixed(0)}% over your total monthly budget.`);
+    } else {
+      insights.push(`You've used ${budgetPercentage.toFixed(0)}% of your total monthly budget.`);
+    }
 
-    const aiResponse = await response.json();
-    const insights = aiResponse.choices[0].message.content;
+    // Most overspent category
+    if (mostOverspentCategory) {
+      const overAmount = mostOverspentCategory.actual_amount - mostOverspentCategory.planned_amount;
+      insights.push(`${mostOverspentCategory.category_name} is your most overspent category, exceeding budget by $${overAmount.toFixed(0)}.`);
+    }
 
+    // Response with exactly 2 insights
     return new Response(
-      JSON.stringify({ insights }),
+      JSON.stringify({ insights: insights.join('\n') }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
