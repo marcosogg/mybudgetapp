@@ -34,7 +34,6 @@ export const transformToTransaction = (
   if (!date || amount >= 0) return null;
   
   return {
-    user_id: userId,
     date,
     description: row[DESCRIPTION_INDEX],
     amount,

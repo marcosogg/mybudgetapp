@@ -19,7 +19,7 @@ export const formatDate = (dateStr: string): string | null => {
 export const parseCSVFile = (
   file: File,
   onComplete: (results: Papa.ParseResult<string[]>) => void,
-  onError: (error: Papa.ParseError) => void
+  onError: (error: Error) => void
 ) => {
   Papa.parse<string[]>(file, {
     complete: onComplete,
