@@ -67,10 +67,12 @@ serve(async (req) => {
           .maybeSingle()
 
         if (!existingTransaction) {
-          // Only insert if the transaction doesn't exist
+          // Make sure user_id is set before inserting
+          const transactionWithUserId = { ...transaction, user_id: userId }
+          
           const { data, error } = await supabase
             .from('transactions')
-            .insert([transaction])
+            .insert([transactionWithUserId])
             .select()
 
           if (error) {
