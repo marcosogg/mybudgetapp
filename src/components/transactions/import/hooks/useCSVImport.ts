@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { parseCSVFile, validateHeaders, REVOLUT_HEADERS } from "../utils/csvValidation";
-import { parseTransactionRow, ParsedTransaction } from "../utils/transactionParser";
+import { parseCSVFile } from "../utils/csvValidation";
+import { ParsedTransaction } from "../utils/baseParser";
 import { useCSVProcessing } from "./useCSVProcessing";
-import { validateWiseFormat } from "../utils/wiseTransformer";
+import { getParser } from "../utils/parserRegistry";
 
 export interface ImportState {
   file: File | null;
@@ -76,35 +76,20 @@ export const useCSVImport = () => {
           .eq('id', user.id)
           .single();
 
-        const isWiseFormat = userProfile?.statement_format === 'wise';
+        const format = userProfile?.statement_format || 'revolut';
+        const parser = getParser(format);
         
-        if (isWiseFormat) {
-          if (!validateWiseFormat(headers)) {
-            setState(prev => ({ 
-              ...prev, 
-              error: "Invalid Wise CSV format. Please ensure you're using the correct export format from Wise." 
-            }));
-            return;
-          }
-          console.log('Processing Wise format');
-          toast({
-            title: "Wise Format Detected",
-            description: "Note: Wise import support is coming soon.",
-          });
-          return;
-        }
-
-        if (!validateHeaders(headers, REVOLUT_HEADERS)) {
+        if (!parser.validateHeaders(headers)) {
           setState(prev => ({ 
             ...prev, 
-            error: "Invalid CSV format. Please ensure the file matches the expected Revolut format." 
+            error: `Invalid ${format} CSV format. Please ensure you're using the correct export format.` 
           }));
           return;
         }
 
         const rows = results.data.slice(1) as string[][];
         const parsedData = rows
-          .map(parseTransactionRow)
+          .map(row => parser.parseTransaction(row))
           .filter((row): row is NonNullable<typeof row> => row !== null);
         
         if (parsedData.length === 0) {

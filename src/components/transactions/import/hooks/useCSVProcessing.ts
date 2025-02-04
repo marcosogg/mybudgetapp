@@ -3,8 +3,8 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { transformToTransaction } from '../utils/transactionParser';
 import Papa from 'papaparse';
+import { getParser } from '../utils/parserRegistry';
 
 interface ProcessingState {
   isProcessing: boolean;
@@ -36,12 +36,21 @@ export const useCSVProcessing = () => {
         throw new Error("User not authenticated");
       }
 
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('statement_format')
+        .eq('id', user.id)
+        .single();
+
+      const format = userProfile?.statement_format || 'revolut';
+      const parser = getParser(format);
+
       const transactions: any[] = await new Promise((resolve, reject) => {
         Papa.parse(file, {
           complete: (results) => {
             const rows = results.data.slice(1) as string[][];
             const parsedTransactions = rows
-              .map(row => transformToTransaction(row, user.id))
+              .map(row => parser.transformToTransaction(row, user.id))
               .filter((t): t is NonNullable<typeof t> => t !== null);
             
             resolve(parsedTransactions);
