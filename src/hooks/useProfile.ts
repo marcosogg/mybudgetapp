@@ -7,6 +7,7 @@ interface Profile {
   email: string;
   salary: number;
   bonus: number;
+  statement_format: "revolut" | "wise";
   created_at: string;
   updated_at: string;
 }
@@ -32,24 +33,24 @@ export const useProfile = () => {
   });
 
   const updateIncome = useMutation({
-    mutationFn: async ({ salary, bonus }: { salary: number; bonus: number }) => {
+    mutationFn: async ({ salary, bonus, statement_format }: { salary: number; bonus: number; statement_format?: "revolut" | "wise" }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
       const { error } = await supabase
         .from("profiles")
-        .update({ salary, bonus })
+        .update({ salary, bonus, statement_format })
         .eq("id", user.id);
 
       if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Income updated successfully");
+      toast.success("Profile updated successfully");
     },
     onError: (error) => {
-      toast.error("Failed to update income");
-      console.error("Error updating income:", error);
+      toast.error("Failed to update profile");
+      console.error("Error updating profile:", error);
     },
   });
 

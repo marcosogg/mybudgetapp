@@ -127,6 +127,9 @@ export type Database = {
           email_notifications_enabled: boolean | null
           id: string
           salary: number
+          statement_format:
+            | Database["public"]["Enums"]["statement_format"]
+            | null
           updated_at: string
         }
         Insert: {
@@ -136,6 +139,9 @@ export type Database = {
           email_notifications_enabled?: boolean | null
           id: string
           salary?: number
+          statement_format?:
+            | Database["public"]["Enums"]["statement_format"]
+            | null
           updated_at?: string
         }
         Update: {
@@ -145,6 +151,9 @@ export type Database = {
           email_notifications_enabled?: boolean | null
           id?: string
           salary?: number
+          statement_format?:
+            | Database["public"]["Enums"]["statement_format"]
+            | null
           updated_at?: string
         }
         Relationships: []
@@ -283,7 +292,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      statement_format: "revolut" | "wise"
     }
     CompositeTypes: {
       [_ in never]: never

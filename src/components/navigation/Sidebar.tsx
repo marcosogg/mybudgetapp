@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CircleUserRound } from "lucide-react";
+import { CircleUserRound, Settings } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 
 export const Sidebar = () => {
@@ -87,6 +87,10 @@ export const Sidebar = () => {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
+              <DropdownMenuItem onClick={() => navigate("/settings")}>
+                <Settings className="mr-2 h-4 w-4" />
+                <span>Settings</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={handleLogout}>
                 <span>Logout</span>
               </DropdownMenuItem>
@@ -96,4 +100,4 @@ export const Sidebar = () => {
       </div>
     </div>
   );
-};
+}
