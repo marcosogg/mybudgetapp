@@ -19,25 +19,30 @@ const chartConfig = {
 
 export function BudgetComparisonChart() {
   const { selectedMonth } = useMonth();
+  // Get start date as 2 months before selected month
   const startDate = subMonths(selectedMonth, 2);
   const endDate = selectedMonth;
   
   const { data: comparison } = useMonthlyBudgetComparison();
 
-  const chartData = comparison?.map((item) => ({
-    month: format(new Date(item.month), 'MMMM'),
-    planned: item.planned_total,
-    actual: item.actual_total,
-  }))?.sort((a, b) => {
-    // Sort months chronologically
-    const monthA = new Date(Date.parse(`${a.month} 1, ${selectedMonth.getFullYear()}`));
-    const monthB = new Date(Date.parse(`${b.month} 1, ${selectedMonth.getFullYear()}`));
-    return monthA.getTime() - monthB.getTime();
-  }) || [];
+  // Process and sort the data to ensure we have exactly 3 months
+  const chartData = Array.from({ length: 3 }, (_, index) => {
+    const monthDate = subMonths(selectedMonth, 2 - index);
+    const monthData = comparison?.find(
+      (item) => format(new Date(item.month), 'yyyy-MM') === format(monthDate, 'yyyy-MM')
+    );
 
-  // Calculate trend percentage
+    return {
+      month: format(monthDate, 'MMMM'),
+      monthDate, // Keep the full date for sorting
+      planned: monthData?.planned_total || 0,
+      actual: monthData?.actual_total || 0,
+    };
+  }).sort((a, b) => a.monthDate.getTime() - b.monthDate.getTime());
+
+  // Calculate trend percentage based on the last two months
   const lastTwoMonths = chartData.slice(-2);
-  const trend = lastTwoMonths.length === 2
+  const trend = lastTwoMonths.length === 2 && lastTwoMonths[0].actual !== 0
     ? ((lastTwoMonths[1].actual - lastTwoMonths[0].actual) / lastTwoMonths[0].actual) * 100
     : 0;
 
