@@ -1,13 +1,25 @@
-import { Home, PieChart, List, Bell, LogOut, Wallet } from "lucide-react";
+import { Home, PieChart, List, Bell, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { CircleUserRound } from "lucide-react";
+import { useProfile } from "@/hooks/useProfile";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { profile } = useProfile();
 
   const navigation = [
     { name: "Dashboard", href: "/", icon: Home },
@@ -52,14 +64,35 @@ export const Sidebar = () => {
         })}
       </nav>
       <div className="mt-auto pt-4 border-t border-border">
-        <Button
-          variant="ghost"
-          className="nav-item w-full justify-start gap-2 text-destructive hover:text-destructive hover:bg-destructive/5"
-          onClick={handleLogout}
-        >
-          <LogOut className="h-4 w-4" />
-          <span>Logout</span>
-        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="icon" variant="ghost" className="w-full flex justify-between px-2">
+              <div className="flex items-center gap-2">
+                <CircleUserRound size={20} className="text-muted-foreground" />
+                <span className="text-sm font-medium">Account</span>
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-64" align="start" alignOffset={11} sideOffset={8}>
+            <DropdownMenuLabel className="flex items-start gap-3">
+              <CircleUserRound size={32} className="shrink-0 text-muted-foreground" />
+              <div className="flex min-w-0 flex-col">
+                <span className="truncate text-sm font-medium text-foreground">
+                  {profile?.email}
+                </span>
+                <span className="truncate text-xs font-normal text-muted-foreground">
+                  {profile?.email}
+                </span>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={handleLogout}>
+                <span>Logout</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   );
