@@ -9,13 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { ReminderFormValues } from "@/types/reminder";
 import { useReminderSubmit } from "@/hooks/reminders/useReminderSubmit";
 
@@ -30,7 +24,7 @@ export function ReminderForm({ onSuccess, defaultValues }: ReminderFormProps) {
       name: "",
       amount: 0,
       due_date: new Date().toISOString().split("T")[0],
-      recurrence: "monthly",
+      is_recurring: false,
     },
   });
 
@@ -96,24 +90,21 @@ export function ReminderForm({ onSuccess, defaultValues }: ReminderFormProps) {
 
         <FormField
           control={form.control}
-          name="recurrence"
+          name="is_recurring"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Recurrence</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select recurrence" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="once">Once</SelectItem>
-                  <SelectItem value="weekly">Weekly</SelectItem>
-                  <SelectItem value="monthly">Monthly</SelectItem>
-                  <SelectItem value="yearly">Yearly</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
+            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FormLabel className="text-base">Monthly Recurring</FormLabel>
+                <div className="text-sm text-muted-foreground">
+                  This reminder will repeat every month
+                </div>
+              </div>
+              <FormControl>
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
             </FormItem>
           )}
         />

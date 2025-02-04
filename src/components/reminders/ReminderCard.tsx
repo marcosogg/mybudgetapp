@@ -22,7 +22,17 @@ export function ReminderCard({ reminder }: ReminderCardProps) {
   return (
     <Card>
       <CardHeader className="pb-2 flex flex-row items-start justify-between">
-        <CardTitle className="text-lg font-semibold">{reminder.name}</CardTitle>
+        <div className="space-y-1">
+          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            {reminder.name}
+            {reminder.is_recurring && (
+              <RefreshCw className="h-4 w-4 text-muted-foreground" />
+            )}
+          </CardTitle>
+          {reminder.is_recurring && (
+            <p className="text-sm text-muted-foreground">Repeats monthly</p>
+          )}
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -33,7 +43,7 @@ export function ReminderCard({ reminder }: ReminderCardProps) {
             {reminder.status === "active" && (
               <DropdownMenuItem onClick={() => archiveReminder(reminder.id)}>
                 <Archive className="mr-2 h-4 w-4" />
-                Archive
+                Archive {reminder.is_recurring ? "Series" : "Reminder"}
               </DropdownMenuItem>
             )}
             <DropdownMenuItem
@@ -41,7 +51,7 @@ export function ReminderCard({ reminder }: ReminderCardProps) {
               onClick={() => deleteReminder(reminder.id)}
             >
               <Trash className="mr-2 h-4 w-4" />
-              Delete
+              Delete {reminder.is_recurring ? "Series" : "Reminder"}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -52,10 +62,12 @@ export function ReminderCard({ reminder }: ReminderCardProps) {
             <CalendarDays className="h-4 w-4" />
             <span>Due: {format(new Date(reminder.due_date), "MMM d, yyyy")}</span>
           </div>
-          <Badge variant="secondary" className="flex items-center gap-1">
-            <RefreshCw className="h-3 w-3" />
-            {reminder.recurrence}
-          </Badge>
+          {reminder.is_recurring && (
+            <Badge variant="secondary" className="flex items-center gap-1">
+              <RefreshCw className="h-3 w-3" />
+              Monthly
+            </Badge>
+          )}
         </div>
         <div className="text-xl font-bold">
           ${reminder.amount.toLocaleString()}

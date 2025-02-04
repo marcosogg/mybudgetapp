@@ -15,7 +15,8 @@ export function useReminderSubmit() {
       const reminderData = {
         ...values,
         user_id: user.id,
-        status: 'active' as const
+        status: 'active' as const,
+        recurrence: values.is_recurring ? 'monthly' : 'once'
       };
 
       const { data, error } = await supabase

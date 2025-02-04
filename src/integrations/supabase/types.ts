@@ -155,7 +155,9 @@ export type Database = {
           created_at: string | null
           due_date: string
           id: string
+          is_recurring: boolean
           name: string
+          parent_reminder_id: string | null
           recurrence: string
           status: string
           user_id: string
@@ -165,7 +167,9 @@ export type Database = {
           created_at?: string | null
           due_date: string
           id?: string
+          is_recurring?: boolean
           name: string
+          parent_reminder_id?: string | null
           recurrence: string
           status?: string
           user_id: string
@@ -175,12 +179,21 @@ export type Database = {
           created_at?: string | null
           due_date?: string
           id?: string
+          is_recurring?: boolean
           name?: string
+          parent_reminder_id?: string | null
           recurrence?: string
           status?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "reminders_parent_reminder_id_fkey"
+            columns: ["parent_reminder_id"]
+            isOneToOne: false
+            referencedRelation: "reminders"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reminders_user_id_fkey"
             columns: ["user_id"]

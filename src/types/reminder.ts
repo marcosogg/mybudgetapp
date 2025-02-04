@@ -4,7 +4,8 @@ export interface Reminder {
   name: string;
   amount: number;
   due_date: string;
-  recurrence: string;
+  is_recurring: boolean;
+  parent_reminder_id?: string;
   status: 'active' | 'archived';
   created_at?: string;
 }
@@ -13,5 +14,5 @@ export interface ReminderFormValues {
   name: string;
   amount: number;
   due_date: string;
-  recurrence: string;
+  is_recurring: boolean;
 }
