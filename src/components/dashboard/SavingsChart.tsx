@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format, subMonths } from "date-fns";
-import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { format, subMonths, startOfYear } from "date-fns";
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -21,12 +21,12 @@ export function SavingsChart() {
         .single();
 
       if (!savingsCategory) {
-        return [];
+        return { monthlyData: [], yearTotal: 0 };
       }
 
-      // Get last 6 months of savings data
+      // Get this year's savings data
+      const startDate = startOfYear(new Date());
       const endDate = new Date();
-      const startDate = subMonths(endDate, 5); // Get 6 months of data
 
       const { data: transactions, error } = await supabase
         .from("transactions")
@@ -53,7 +53,13 @@ export function SavingsChart() {
         return acc;
       }, []);
 
-      return monthlyData || [];
+      // Calculate year total
+      const yearTotal = transactions?.reduce((sum, transaction) => sum + transaction.amount, 0) || 0;
+
+      return { 
+        monthlyData: monthlyData || [], 
+        yearTotal 
+      };
     },
   });
 
@@ -62,48 +68,53 @@ export function SavingsChart() {
   }
 
   return (
-    <div className="h-[350px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={savingsData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-          <XAxis 
-            dataKey="month" 
-            stroke="#888888"
-            fontSize={12}
-            tickLine={false}
-            axisLine={false}
-          />
-          <YAxis
-            stroke="#888888"
-            fontSize={12}
-            tickLine={false}
-            axisLine={false}
-            tickFormatter={(value) => `$${value}`}
-          />
-          <Tooltip
-            content={({ active, payload }) => {
-              if (active && payload && payload.length) {
-                return (
-                  <Card className="p-2">
-                    <p className="text-sm font-medium">{payload[0].payload.month}</p>
-                    <p className="text-sm text-muted-foreground">
-                      ${payload[0].value?.toLocaleString()}
-                    </p>
-                  </Card>
-                );
-              }
-              return null;
-            }}
-          />
-          <Area
-            type="monotone"
-            dataKey="amount"
-            stroke="hsl(var(--primary))"
-            fill="hsl(var(--primary))"
-            fillOpacity={0.2}
-            strokeWidth={2}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center px-2">
+        <p className="text-sm text-muted-foreground">Monthly Savings</p>
+        <p className="text-sm font-medium">
+          Year Total: ${savingsData?.yearTotal.toLocaleString() || '0'}
+        </p>
+      </div>
+      <div className="h-[300px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={savingsData?.monthlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+            <XAxis 
+              dataKey="month" 
+              stroke="#888888"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+            />
+            <YAxis
+              stroke="#888888"
+              fontSize={12}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `$${value}`}
+            />
+            <Tooltip
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <Card className="p-2">
+                      <p className="text-sm font-medium">{payload[0].payload.month}</p>
+                      <p className="text-sm text-muted-foreground">
+                        ${payload[0].value?.toLocaleString()}
+                      </p>
+                    </Card>
+                  );
+                }
+                return null;
+              }}
+            />
+            <Bar
+              dataKey="amount"
+              fill="hsl(var(--primary))"
+              radius={[4, 4, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
