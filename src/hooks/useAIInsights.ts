@@ -14,6 +14,12 @@ export function useAIInsights() {
     setError(null);
 
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('No active session');
+      }
+
       const { data, error } = await supabase.functions.invoke('generate-spending-insights', {
         body: { 
           period: format(selectedMonth, 'yyyy-MM-dd')

@@ -13,18 +13,30 @@ serve(async (req) => {
   }
 
   try {
-    const { period } = await req.json();
-    
     // Create Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Get the user ID from the authorization header
+    const authHeader = req.headers.get('authorization')?.split('Bearer ')[1];
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
+    // Verify the JWT and get the user
+    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader);
+    if (authError || !user) {
+      throw new Error('Invalid token');
+    }
+
+    const { period } = await req.json();
+    
     // Get the comparison data for the selected period
     const { data: comparison, error: comparisonError } = await supabase.rpc(
       'get_budget_comparison',
       { 
-        p_user_id: req.auth.uid,
+        p_user_id: user.id,
         p_period: period
       }
     );
