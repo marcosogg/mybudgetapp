@@ -7,22 +7,21 @@ import { cn } from "@/lib/utils";
 
 const InsightItem = ({ content }: { content: string }) => {
   const isPositive = content.toLowerCase().includes('under') || 
-                     !content.toLowerCase().includes('over');
+                     content.toLowerCase().includes('no transactions');
   
   return (
     <div className={cn(
-      "p-4 rounded-lg flex items-start gap-3",
-      "bg-card hover:bg-accent/50 transition-colors",
-      "border border-border"
+      "flex items-start gap-3 py-3",
+      "border-b last:border-b-0 border-border"
     )}>
-      <span className="mt-1">
+      <span className="mt-0.5">
         {isPositive ? (
           <TrendingUp className="h-4 w-4 text-primary" />
         ) : (
           <TrendingDown className="h-4 w-4 text-destructive" />
         )}
       </span>
-      <p className="text-sm">{content}</p>
+      <p className="text-sm leading-tight">{content}</p>
     </div>
   );
 };
@@ -50,22 +49,24 @@ export function ChartsSection() {
           >
             <RefreshCw 
               className={cn(
-                "h-5 w-5 text-muted-foreground",
+                "h-4 w-4 text-muted-foreground",
                 isLoading && "animate-spin"
               )} 
             />
             <span className="sr-only">Refresh insights</span>
           </Button>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent>
           {error ? (
             <div className="text-sm text-destructive">
               Failed to load insights
             </div>
           ) : insights ? (
-            insights.split('\n').map((insight, index) => (
-              <InsightItem key={index} content={insight} />
-            ))
+            <div className="space-y-0">
+              {insights.split('\n').map((insight, index) => (
+                <InsightItem key={index} content={insight} />
+              ))}
+            </div>
           ) : (
             <div className="text-sm text-muted-foreground text-center py-4">
               {isLoading ? "Analyzing your spending..." : "Click refresh to generate insights"}

@@ -1,17 +1,24 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useMonth } from "@/contexts/MonthContext";
+import { format } from "date-fns";
 
 export function useAIInsights() {
   const [insights, setInsights] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { selectedMonth } = useMonth();
 
   const refreshInsights = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const { data, error } = await supabase.functions.invoke('generate-spending-insights');
+      const { data, error } = await supabase.functions.invoke('generate-spending-insights', {
+        body: { 
+          period: format(selectedMonth, 'yyyy-MM-dd')
+        }
+      });
       
       if (error) throw error;
       
