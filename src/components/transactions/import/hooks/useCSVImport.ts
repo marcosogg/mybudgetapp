@@ -4,9 +4,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import Papa from 'papaparse';
 import { supabase } from "@/integrations/supabase/client";
+import { validateWiseFormat, transformWiseData } from "../utils/wiseTransformer";
 
-// Constants moved to a central location
-const EXPECTED_HEADERS = [
+// Constants for Revolut format
+const REVOLUT_HEADERS = [
   'Type', 'Product', 'Started Date', 'Completed Date', 
   'Description', 'Amount', 'Fee', 'Currency', 'State', 'Balance'
 ];
@@ -74,18 +75,49 @@ export const useCSVImport = () => {
     setState(prev => ({ ...prev, file: selectedFile }));
     
     Papa.parse(selectedFile, {
-      complete: (results) => {
+      complete: async (results) => {
         if (results.data.length === 0) {
           setState(prev => ({ ...prev, error: "The CSV file is empty" }));
           return;
         }
 
         const headers = results.data[0] as string[];
+        const { data: { user } } = await supabase.auth.getUser();
         
-        if (!EXPECTED_HEADERS.every((header, index) => headers[index] === header)) {
+        if (!user) {
+          setState(prev => ({ ...prev, error: "User not authenticated" }));
+          return;
+        }
+
+        const { data: userProfile } = await supabase
+          .from('profiles')
+          .select('statement_format')
+          .eq('id', user.id)
+          .single();
+
+        const isWiseFormat = userProfile?.statement_format === 'wise';
+        
+        if (isWiseFormat) {
+          if (!validateWiseFormat(headers)) {
+            setState(prev => ({ 
+              ...prev, 
+              error: "Invalid Wise CSV format. Please ensure you're using the correct export format from Wise." 
+            }));
+            return;
+          }
+          console.log('Processing Wise format');
+          toast({
+            title: "Wise Format Detected",
+            description: "Note: Wise import support is coming soon.",
+          });
+          return;
+        }
+
+        // Existing Revolut format validation
+        if (!REVOLUT_HEADERS.every((header, index) => headers[index] === header)) {
           setState(prev => ({ 
             ...prev, 
-            error: "Invalid CSV format. Please ensure the file matches the expected format." 
+            error: "Invalid CSV format. Please ensure the file matches the expected Revolut format." 
           }));
           return;
         }
