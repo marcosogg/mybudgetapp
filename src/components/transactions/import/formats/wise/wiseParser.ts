@@ -14,12 +14,19 @@ export const WiseParser: StatementParser = {
   parseTransaction: (row: string[]): ParsedTransaction | null => {
     const date = formatDate(row[1]); // Date column
     const amount = parseFloat(row[2]); // Amount column
-    const payeeName = row[11]?.trim() || ''; // Payee Name column
-    const merchant = row[13]?.trim() || ''; // Merchant column
-    const description = `${payeeName}${merchant}`.trim();
+    
+    // Only process rows with negative amounts
+    if (!date || isNaN(amount) || amount >= 0) {
+      return null;
+    }
 
-    // Check if it's a valid row with a negative amount
-    if (!date || isNaN(amount) || amount >= 0) return null;
+    // Combine Payee Name and Merchant for description
+    const payeeName = row[11]?.trim() || '';
+    const merchant = row[13]?.trim() || '';
+    const description = [payeeName, merchant]
+      .filter(Boolean)
+      .join(' - ')
+      .trim() || 'Unnamed Transaction';
 
     return {
       date,
@@ -34,12 +41,19 @@ export const WiseParser: StatementParser = {
   ): Omit<Transaction, "id" | "created_at"> | null => {
     const date = formatDate(row[1]); // Date column
     const amount = parseFloat(row[2]); // Amount column
-    const payeeName = row[11]?.trim() || ''; // Payee Name column
-    const merchant = row[13]?.trim() || ''; // Merchant column
-    const description = `${payeeName}${merchant}`.trim();
-
+    
     // Only process rows with negative amounts
-    if (!date || isNaN(amount) || amount >= 0) return null;
+    if (!date || isNaN(amount) || amount >= 0) {
+      return null;
+    }
+
+    // Combine Payee Name and Merchant for description
+    const payeeName = row[11]?.trim() || '';
+    const merchant = row[13]?.trim() || '';
+    const description = [payeeName, merchant]
+      .filter(Boolean)
+      .join(' - ')
+      .trim() || 'Unnamed Transaction';
 
     return {
       user_id: userId,

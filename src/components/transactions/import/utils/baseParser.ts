@@ -17,22 +17,16 @@ export const formatDate = (dateStr: string): string | null => {
   if (!dateStr?.trim()) return null;
   
   try {
-    // Try parsing as Revolut format (with time)
-    const revolutDate = parse(dateStr, 'dd/MM/yyyy HH:mm', new Date());
-    if (isValid(revolutDate)) {
-      return format(revolutDate, 'yyyy-MM-dd');
-    }
-
-    // Try parsing as Wise format (without time)
+    // Parse Wise format (DD/MM/YYYY)
     const wiseDate = parse(dateStr, 'dd/MM/yyyy', new Date());
     if (isValid(wiseDate)) {
       return format(wiseDate, 'yyyy-MM-dd');
     }
 
-    // Try parsing ISO format as fallback
-    const isoDate = new Date(dateStr);
-    if (isValid(isoDate)) {
-      return format(isoDate, 'yyyy-MM-dd');
+    // Fallback to Revolut format (DD/MM/YYYY HH:mm)
+    const revolutDate = parse(dateStr, 'dd/MM/yyyy HH:mm', new Date());
+    if (isValid(revolutDate)) {
+      return format(revolutDate, 'yyyy-MM-dd');
     }
 
     console.warn(`Unable to parse date: ${dateStr}`);
