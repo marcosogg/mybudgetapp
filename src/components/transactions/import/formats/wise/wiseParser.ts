@@ -11,32 +11,51 @@ export const WiseParser: StatementParser = {
       required: WISE_HEADERS,
     });
     return WISE_HEADERS.every(requiredHeader =>
-      headers.some(header => header === requiredHeader)
+      headers.includes(requiredHeader)
     );
   },
 
   parseTransaction: (row: string[]): ParsedTransaction | null => {
     console.log('Processing Wise row:', {
+      rawRow: row,
       dateField: row[1],
       amountField: row[2],
       payeeName: row[11],
       merchant: row[13]
     });
 
-    const date = formatDate(row[1]); // Date column
-    const amount = parseFloat(row[2]); // Amount column
-    
-    // Only process rows with negative amounts
-    if (!date || isNaN(amount) || amount >= 0) {
-      console.log('Skipping row:', { 
-        reason: !date ? 'invalid date' : isNaN(amount) ? 'invalid amount' : 'positive amount',
-        date,
-        amount 
-      });
+    // Validate date
+    const rawDate = row[1]?.trim();
+    if (!rawDate) {
+      console.log('Skipping row: empty date');
       return null;
     }
 
-    // Combine Payee Name and Merchant for description
+    const date = formatDate(rawDate);
+    if (!date) {
+      console.log('Skipping row: invalid date format', { rawDate });
+      return null;
+    }
+
+    // Validate amount
+    const rawAmount = row[2]?.trim();
+    if (!rawAmount) {
+      console.log('Skipping row: empty amount');
+      return null;
+    }
+
+    const amount = parseFloat(rawAmount);
+    if (isNaN(amount)) {
+      console.log('Skipping row: invalid amount format', { rawAmount });
+      return null;
+    }
+
+    if (amount >= 0) {
+      console.log('Skipping row: positive amount', { amount });
+      return null;
+    }
+
+    // Build description
     const payeeName = row[11]?.trim() || '';
     const merchant = row[13]?.trim() || '';
     const description = [payeeName, merchant]
@@ -47,7 +66,7 @@ export const WiseParser: StatementParser = {
     const result = {
       date,
       description,
-      amount: row[2],
+      amount: rawAmount,
     };
 
     console.log('Successfully parsed transaction:', result);

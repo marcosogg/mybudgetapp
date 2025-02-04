@@ -23,30 +23,40 @@ export const formatDate = (dateStr: string): string | null => {
   });
   
   try {
+    // First try to parse the date with slashes
+    let dateToFormat = dateStr;
+    if (dateStr.includes('-')) {
+      dateToFormat = dateStr.replace(/-/g, '/');
+      console.log('Converted hyphens to slashes:', dateToFormat);
+    }
+
     // Parse Wise format (DD/MM/YYYY)
-    const wiseDate = parse(dateStr, 'dd/MM/yyyy', new Date());
+    const wiseDate = parse(dateToFormat, 'dd/MM/yyyy', new Date());
     if (isValid(wiseDate)) {
       const formattedDate = format(wiseDate, 'yyyy-MM-dd');
       console.log('Successfully parsed Wise date:', {
         input: dateStr,
+        converted: dateToFormat,
         output: formattedDate
       });
       return formattedDate;
     }
 
     // Fallback to Revolut format (DD/MM/YYYY HH:mm)
-    const revolutDate = parse(dateStr, 'dd/MM/yyyy HH:mm', new Date());
+    const revolutDate = parse(dateToFormat, 'dd/MM/yyyy HH:mm', new Date());
     if (isValid(revolutDate)) {
       const formattedDate = format(revolutDate, 'yyyy-MM-dd');
       console.log('Successfully parsed Revolut date:', {
         input: dateStr,
+        converted: dateToFormat,
         output: formattedDate
       });
       return formattedDate;
     }
 
     console.warn(`Unable to parse date: ${dateStr}`, {
-      attemptedFormats: ['dd/MM/yyyy', 'dd/MM/yyyy HH:mm']
+      attemptedFormats: ['dd/MM/yyyy', 'dd/MM/yyyy HH:mm'],
+      withSlashes: dateToFormat
     });
     return null;
   } catch (error) {
