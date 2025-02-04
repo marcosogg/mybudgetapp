@@ -1,5 +1,6 @@
 import { IncomeSection } from "@/components/budget/IncomeSection";
 import { BudgetSection } from "@/components/budget/BudgetSection";
+import { SavingsSummary } from "@/components/budget/SavingsSummary";
 
 const Budget = () => {
   return (
@@ -10,6 +11,7 @@ const Budget = () => {
 
       <div className="grid gap-6">
         <IncomeSection />
+        <SavingsSummary />
         <BudgetSection />
       </div>
     </div>
