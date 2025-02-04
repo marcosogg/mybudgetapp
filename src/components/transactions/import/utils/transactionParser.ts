@@ -27,7 +27,7 @@ export const parseTransactionRow = (row: string[]): ParsedTransaction | null => 
 export const transformToTransaction = (
   row: string[], 
   userId: string
-): Partial<Transaction> | null => {
+): Omit<Transaction, 'id' | 'created_at'> | null => {
   const date = formatDate(row[DATE_INDEX]);
   const amount = parseFloat(row[AMOUNT_INDEX]);
   

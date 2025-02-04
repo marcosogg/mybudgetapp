@@ -21,7 +21,7 @@ export const parseCSVFile = (
   onComplete: (results: Papa.ParseResult<string[]>) => void,
   onError: (error: Papa.ParseError) => void
 ) => {
-  Papa.parse(file, {
+  Papa.parse<string[]>(file, {
     complete: onComplete,
     error: onError,
   });
