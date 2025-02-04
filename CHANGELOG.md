@@ -8,6 +8,8 @@
 - Improved code organization with dedicated budget utilities folder
 - Added Period Overview card with month picker to dashboard
 - Reorganized dashboard top cards layout for better visual hierarchy
+- Added Spending Analysis and Savings cards to dashboard
+- Updated styling for consistent appearance across dashboard cards
 
 ### Changed
 - Refactored budget calculations into reusable utility functions
@@ -20,6 +22,8 @@
 - Improved number formatting and accessibility in budget display
 - Added over-budget indicator with color changes and warning icon
 - Enhanced accessibility for budget status indicators
+- Modified dashboard layout from 2 to 3 cards for better data visualization
+- Improved responsive layout for better mobile experience
 
 ### Technical Details
 - Created pure calculation functions for better testability

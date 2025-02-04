@@ -1,4 +1,4 @@
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, LineChart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
@@ -41,9 +41,12 @@ export function BudgetComparisonChart() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Monthly Budget Overview</CardTitle>
-        <CardDescription>January - June 2025</CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <div className="space-y-1">
+          <CardTitle>Monthly Budget Overview</CardTitle>
+          <CardDescription>Showing budget comparison for the last 3 months</CardDescription>
+        </div>
+        <LineChart className="h-5 w-5 text-muted-foreground" />
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -100,7 +103,7 @@ export function BudgetComparisonChart() {
           )}
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing budget comparison for the last 6 months
+          Showing budget comparison for the last 3 months
         </div>
       </CardFooter>
     </Card>
