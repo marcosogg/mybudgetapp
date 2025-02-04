@@ -9,7 +9,7 @@ interface ReminderDialogProps {
     name: string;
     amount: number;
     due_date: string;
-    recurrence: string;
+    is_recurring: boolean;
   };
 }
 

@@ -22,24 +22,26 @@ export function useReminders(status: 'active' | 'archived' = 'active') {
       if (error) throw error;
 
       // Process recurring reminders
-      const reminders = baseReminders.map((reminder: Reminder) => {
-        if (!reminder.is_recurring) return reminder;
+      const reminders = baseReminders.map((reminder) => {
+        const typedReminder = reminder as Reminder;
+        
+        if (!typedReminder.is_recurring) return typedReminder;
 
         // For recurring reminders, adjust the due date to current month if needed
-        const reminderDate = new Date(reminder.due_date);
+        const reminderDate = new Date(typedReminder.due_date);
         if (reminderDate < monthStart) {
           return {
-            ...reminder,
+            ...typedReminder,
             due_date: format(
               new Date(today.getFullYear(), today.getMonth(), reminderDate.getDate()),
               'yyyy-MM-dd'
             ),
           };
         }
-        return reminder;
+        return typedReminder;
       });
 
-      return reminders as Reminder[];
+      return reminders;
     },
   });
 }
