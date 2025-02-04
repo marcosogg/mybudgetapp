@@ -14,6 +14,10 @@
 - Enhanced date parsing using date-fns library
 - Robust date format handling for both Wise and Revolut formats
 - Improved date validation and error handling
+- Support for multiple date formats (DD/MM/YYYY, YYYY/MM/DD)
+- Comprehensive date parsing validation
+- Detailed logging for debugging date parsing issues
+- Format normalization for consistent date handling
 
 ### Changed
 - Enhanced CSV import to conditionally handle different statement formats
@@ -24,6 +28,9 @@
 - Simplified date parsing logic using date-fns
 - Standardized date display format across the application
 - Improved date parsing error handling and logging
+- Enhanced validation for date string inputs
+- Normalized date separators for consistent parsing
+- Added detailed logging for debugging purposes
 
 ### Technical Details
 - Added wiseTransformer.ts for handling Wise-specific transformations
@@ -33,3 +40,5 @@
 - Added AlertDialog component for format change confirmation
 - Implemented robust date parsing using date-fns library
 - Added comprehensive error handling for date parsing
+- Implemented defensive programming for date handling
+- Added support for multiple date format detection

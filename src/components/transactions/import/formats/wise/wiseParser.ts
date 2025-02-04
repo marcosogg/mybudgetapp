@@ -2,7 +2,13 @@ import { StatementParser, ParsedTransaction } from "../../utils/baseParser";
 import { formatDate } from "../../utils/baseParser";
 import { Transaction } from "@/types/transaction";
 
-export const WISE_HEADERS = ['TransferWise ID', 'Date', 'Amount', 'Currency', 'Description', 'Payment Reference', 'Running Balance', 'Exchange From', 'Exchange To', 'Exchange Rate', 'Payer Name', 'Payee Name', 'Payee Account Number', 'Merchant', 'Card Last Four Digits', 'Card Holder Full Name', 'Attachment', 'Note', 'Total fees', 'Exchange To Amount'];
+export const WISE_HEADERS = [
+  'TransferWise ID', 'Date', 'Amount', 'Currency', 'Description', 
+  'Payment Reference', 'Running Balance', 'Exchange From', 'Exchange To', 
+  'Exchange Rate', 'Payer Name', 'Payee Name', 'Payee Account Number', 
+  'Merchant', 'Card Last Four Digits', 'Card Holder Full Name', 
+  'Attachment', 'Note', 'Total fees', 'Exchange To Amount'
+];
 
 export const WiseParser: StatementParser = {
   validateHeaders: (headers: string[]): boolean => {
