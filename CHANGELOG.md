@@ -18,6 +18,9 @@
 - Comprehensive date parsing validation
 - Detailed logging for debugging date parsing issues
 - Format normalization for consistent date handling
+- Import validation warnings with statement type confirmation
+- Statement type indicator on import page
+- Improved import flow with user preferences validation
 
 ### Changed
 - Enhanced CSV import to conditionally handle different statement formats
@@ -31,6 +34,8 @@
 - Enhanced validation for date string inputs
 - Normalized date separators for consistent parsing
 - Added detailed logging for debugging purposes
+- Updated import UI with clear format indicators
+- Enhanced import flow with confirmation dialogs
 
 ### Technical Details
 - Added wiseTransformer.ts for handling Wise-specific transformations

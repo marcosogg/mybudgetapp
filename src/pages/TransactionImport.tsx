@@ -4,8 +4,14 @@ import { FileUpload } from "@/components/transactions/import/FileUpload";
 import { CSVPreview } from "@/components/transactions/import/CSVPreview";
 import { ImportProgress } from "@/components/transactions/import/ImportProgress";
 import { useCSVImport } from "@/components/transactions/import/hooks/useCSVImport";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { useProfile } from "@/hooks/useProfile";
+import { useNavigate } from "react-router-dom";
 
 const TransactionImport = () => {
+  const navigate = useNavigate();
+  const { profile, isLoading } = useProfile();
   const {
     file,
     previewData,
@@ -18,6 +24,27 @@ const TransactionImport = () => {
     processFile,
   } = useCSVImport();
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!profile?.statement_format) {
+    return (
+      <Alert className="mb-4">
+        <AlertDescription>
+          Please set your statement format in the{" "}
+          <span 
+            className="text-primary cursor-pointer underline" 
+            onClick={() => navigate("/settings")}
+          >
+            settings page
+          </span>{" "}
+          before importing transactions.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -26,6 +53,15 @@ const TransactionImport = () => {
           Import your transactions from a CSV file
         </p>
       </div>
+
+      <Alert>
+        <AlertDescription className="flex items-center gap-2">
+          Current import type:{" "}
+          <Badge variant="outline" className="text-sm">
+            {profile.statement_format.toUpperCase()}
+          </Badge>
+        </AlertDescription>
+      </Alert>
 
       <Card>
         <CardHeader>
