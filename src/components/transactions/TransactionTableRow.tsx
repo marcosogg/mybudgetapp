@@ -5,6 +5,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Transaction } from "@/types/transaction";
 import { getTagStyle } from "@/utils/tagUtils";
+import { format, parse, isValid } from "date-fns";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,9 +31,23 @@ export const TransactionTableRow = ({
   onEdit,
   onDelete,
 }: TransactionTableRowProps) => {
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      if (isValid(date)) {
+        return format(date, 'dd/MM/yyyy');
+      }
+      console.warn(`Invalid date format: ${dateString}`);
+      return dateString;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return dateString;
+    }
+  };
+
   return (
     <TableRow key={transaction.id}>
-      <TableCell>{transaction.date}</TableCell>
+      <TableCell>{formatDate(transaction.date)}</TableCell>
       <TableCell>{transaction.description}</TableCell>
       <TableCell>
         <CategoryBadge categoryName={transaction.category?.name ?? null} />

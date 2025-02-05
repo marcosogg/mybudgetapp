@@ -17,12 +17,14 @@ export function SavingsSummary() {
       if (!user) throw new Error("User not authenticated");
 
       // Get the savings category ID first
-      const { data: savingsCategory } = await supabase
+      const { data: savingsCategory, error: categoryError } = await supabase
         .from("categories")
         .select("id")
         .eq("user_id", user.id)
         .eq("name", "Savings")
-        .single();
+        .maybeSingle();
+
+      if (categoryError) throw categoryError;
 
       if (!savingsCategory) {
         return { currentMonth: 0, previousMonth: 0, total: 0 };

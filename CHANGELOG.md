@@ -3,34 +3,47 @@
 ## [Unreleased]
 
 ### Added
-- New budget calculation utilities in `src/utils/budget/calculations.ts`
-- New custom hook `useBudgetMetrics` for centralized budget calculations
-- Improved code organization with dedicated budget utilities folder
-- Added Period Overview card with month picker to dashboard
-- Reorganized dashboard top cards layout for better visual hierarchy
-- Added Spending Analysis and Savings cards to dashboard
-- Updated styling for consistent appearance across dashboard cards
+- Initial groundwork for Wise statement format support
+- New utility file for Wise data transformation
+- Basic format detection for Wise CSV files
+- Placeholder structure for future Wise import implementation
+- User-friendly notifications for Wise format detection
+- Confirmation dialog for statement format changes
+- Warning message for format changes
+- Improved user feedback for format updates
+- Enhanced date parsing using date-fns library
+- Robust date format handling for both Wise and Revolut formats
+- Improved date validation and error handling
+- Support for multiple date formats (DD/MM/YYYY, YYYY/MM/DD)
+- Comprehensive date parsing validation
+- Detailed logging for debugging date parsing issues
+- Format normalization for consistent date handling
+- Import validation warnings with statement type confirmation
+- Statement type indicator on import page
+- Improved import flow with user preferences validation
 
 ### Changed
-- Refactored budget calculations into reusable utility functions
-- Simplified budget calculation logic with pure functions
-- Improved type safety for budget calculations
-- Updated dashboard layout to group summary cards under a period overview
-- Integrated month picker with existing MonthContext
-- Redesigned Monthly Budget card with improved visual hierarchy and progress tracking
-- Enhanced budget progress visualization with new progress bar design
-- Improved number formatting and accessibility in budget display
-- Added over-budget indicator with color changes and warning icon
-- Enhanced accessibility for budget status indicators
-- Modified dashboard layout from 2 to 3 cards for better data visualization
-- Improved responsive layout for better mobile experience
+- Enhanced CSV import to conditionally handle different statement formats
+- Improved error messages for format-specific validation
+- Updated import logic to check user's preferred statement format
+- Preserved existing Revolut import functionality
+- Added safety check before changing statement format
+- Simplified date parsing logic using date-fns
+- Standardized date display format across the application
+- Improved date parsing error handling and logging
+- Enhanced validation for date string inputs
+- Normalized date separators for consistent parsing
+- Added detailed logging for debugging purposes
+- Updated import UI with clear format indicators
+- Enhanced import flow with confirmation dialogs
 
 ### Technical Details
-- Created pure calculation functions for better testability
-- Implemented memoization for performance optimization
-- Centralized budget calculation logic to reduce code duplication
-- Enhanced dashboard component organization
-- Improved responsive layout handling
-- Added ARIA labels for better accessibility
-- Enhanced number formatting for better readability
-- Implemented visual indicators for over-budget status
+- Added wiseTransformer.ts for handling Wise-specific transformations
+- Enhanced format validation with statement_format awareness
+- Added logging for future Wise format implementation
+- Maintained backward compatibility with Revolut format
+- Added AlertDialog component for format change confirmation
+- Implemented robust date parsing using date-fns library
+- Added comprehensive error handling for date parsing
+- Implemented defensive programming for date handling
+- Added support for multiple date format detection

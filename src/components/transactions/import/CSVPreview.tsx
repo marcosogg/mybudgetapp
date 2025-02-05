@@ -9,10 +9,11 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileText } from "lucide-react";
+import { ParsedTransaction } from "./utils/baseParser";
 
 interface CSVPreviewProps {
   headers: string[];
-  previewData: Array<{ [key: string]: string }>;
+  previewData: ParsedTransaction[];
   totalRows: number;
   onProcess: () => void;
   isProcessing: boolean;
@@ -72,7 +73,7 @@ export const CSVPreview = ({
                 <TableRow key={index}>
                   {headers.map((header) => (
                     <TableCell key={header}>
-                      {row[header.toLowerCase()]}
+                      {row[header.toLowerCase() as keyof ParsedTransaction]}
                     </TableCell>
                   ))}
                 </TableRow>

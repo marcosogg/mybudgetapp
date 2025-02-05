@@ -8,6 +8,8 @@ import TransactionImport from "@/pages/TransactionImport";
 import Budget from "@/pages/Budget";
 import Reminders from "@/pages/Reminders";
 
+import Settings from "@/pages/Settings";
+
 export const routes: RouteObject[] = [
   {
     path: "/",
@@ -58,6 +60,14 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <Reminders />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/settings",
+    element: (
+      <ProtectedRoute>
+        <Settings />
       </ProtectedRoute>
     ),
   },
