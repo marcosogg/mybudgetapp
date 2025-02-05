@@ -5,6 +5,7 @@ import { toast } from "sonner";
 interface Profile {
   id: string;
   email: string;
+  name: string | null;
   salary: number;
   bonus: number;
   statement_format: "revolut" | "wise";
@@ -33,13 +34,18 @@ export const useProfile = () => {
   });
 
   const updateIncome = useMutation({
-    mutationFn: async ({ salary, bonus, statement_format }: { salary: number; bonus: number; statement_format?: "revolut" | "wise" }) => {
+    mutationFn: async ({ salary, bonus, statement_format, name }: { 
+      salary: number; 
+      bonus: number; 
+      statement_format?: "revolut" | "wise";
+      name?: string;
+    }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("No user found");
 
       const { error } = await supabase
         .from("profiles")
-        .update({ salary, bonus, statement_format })
+        .update({ salary, bonus, statement_format, name })
         .eq("id", user.id);
 
       if (error) throw error;

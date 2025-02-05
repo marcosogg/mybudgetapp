@@ -126,6 +126,7 @@ export type Database = {
           email: string
           email_notifications_enabled: boolean | null
           id: string
+          name: string | null
           salary: number
           statement_format:
             | Database["public"]["Enums"]["statement_format"]
@@ -138,6 +139,7 @@ export type Database = {
           email: string
           email_notifications_enabled?: boolean | null
           id: string
+          name?: string | null
           salary?: number
           statement_format?:
             | Database["public"]["Enums"]["statement_format"]
@@ -150,6 +152,7 @@ export type Database = {
           email?: string
           email_notifications_enabled?: boolean | null
           id?: string
+          name?: string | null
           salary?: number
           statement_format?:
             | Database["public"]["Enums"]["statement_format"]

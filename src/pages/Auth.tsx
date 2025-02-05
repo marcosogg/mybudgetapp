@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const navigate = useNavigate();
@@ -26,6 +27,11 @@ const Auth = () => {
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              name: name,
+            },
+          },
         });
         if (error) throw error;
         toast({
@@ -66,6 +72,20 @@ const Auth = () => {
             </div>
 
             <div className="space-y-4">
+              {isSignUp && (
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="John Doe"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    disabled={isLoading}
+                  />
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -136,7 +156,6 @@ const Auth = () => {
           </form>
         </CardContent>
       </Card>
-
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -23,6 +24,7 @@ export default function Settings() {
   const navigate = useNavigate();
   const [showFormatDialog, setShowFormatDialog] = useState(false);
   const [pendingFormat, setPendingFormat] = useState<"revolut" | "wise" | null>(null);
+  const [name, setName] = useState(profile?.name || "");
 
   const handleFormatChange = async (format: "revolut" | "wise") => {
     setPendingFormat(format);
@@ -37,13 +39,28 @@ export default function Settings() {
         salary: profile?.salary || 0,
         bonus: profile?.bonus || 0,
         statement_format: pendingFormat,
+        name: name,
       });
-      toast.success("Statement format updated successfully");
+      toast.success("Settings updated successfully");
     } catch (error) {
-      toast.error("Failed to update statement format");
+      toast.error("Failed to update settings");
     } finally {
       setShowFormatDialog(false);
       setPendingFormat(null);
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      await updateIncome.mutateAsync({
+        salary: profile?.salary || 0,
+        bonus: profile?.bonus || 0,
+        statement_format: profile?.statement_format || "revolut",
+        name: name,
+      });
+      toast.success("Profile updated successfully");
+    } catch (error) {
+      toast.error("Failed to update profile");
     }
   };
 
@@ -65,6 +82,24 @@ export default function Settings() {
         </Button>
         <h1 className="text-2xl font-semibold">Settings</h1>
       </div>
+
+      <Card className="p-6">
+        <h2 className="text-lg font-semibold mb-4">Profile</h2>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+            />
+          </div>
+          <Button onClick={handleUpdateProfile}>
+            Update Profile
+          </Button>
+        </div>
+      </Card>
 
       <Card className="p-6">
         <h2 className="text-lg font-semibold mb-4">Statement Format</h2>
