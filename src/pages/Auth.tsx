@@ -108,32 +108,6 @@ const Auth = () => {
               {isSignUp ? "Sign Up" : "Login"}
             </Button>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <Button variant="outline" type="button" className="w-full">
-                <Icons.apple className="h-4 w-4" />
-                <span className="sr-only">Apple</span>
-              </Button>
-              <Button variant="outline" type="button" className="w-full">
-                <Icons.google className="h-4 w-4" />
-                <span className="sr-only">Google</span>
-              </Button>
-              <Button variant="outline" type="button" className="w-full">
-                <Icons.meta className="h-4 w-4" />
-                <span className="sr-only">Meta</span>
-              </Button>
-            </div>
-
             <div className="text-center text-sm text-muted-foreground">
               {isSignUp ? (
                 <>
@@ -162,12 +136,7 @@ const Auth = () => {
           </form>
         </CardContent>
       </Card>
-      <p className="mt-4 text-center text-sm text-muted-foreground">
-        By clicking continue, you agree to our{" "}
-        <a href="#" className="hover:underline">Terms of Service</a>{" "}
-        and{" "}
-        <a href="#" className="hover:underline">Privacy Policy</a>.
-      </p>
+
     </div>
   );
 };
