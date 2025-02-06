@@ -1,4 +1,3 @@
-
 import { Home, PieChart, List, Bell, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -44,9 +43,8 @@ export const Sidebar = () => {
     <div className="h-full p-4 space-y-4 flex flex-col bg-background">
       <div className="mb-8">
         <img 
-          src="/lovable-uploads/72022642-78a3-4ff9-a14c-48acb8e1f402.png" 
+          src="/MyBudget-logo.svg"
           alt="MyBudget Logo" 
-          className="h-8 w-auto"
         />
       </div>
       <nav className="space-y-1.5">
