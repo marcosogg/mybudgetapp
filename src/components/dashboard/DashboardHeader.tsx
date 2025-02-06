@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { GreetingHeader } from "./GreetingHeader";
+import { QuickInsightsDialog } from "./QuickInsightsDialog";
 
 export function DashboardHeader() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ export function DashboardHeader() {
       <div className="container flex justify-between items-center">
         <GreetingHeader />
         <div className="flex items-center gap-3">
+          <QuickInsightsDialog />
           <Button
             onClick={() => navigate("/transactions/import")}
             variant="outline"

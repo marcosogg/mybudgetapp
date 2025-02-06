@@ -131,7 +131,7 @@ Each insight should be on a new line and be clear and actionable.`;
     console.log('Calling OpenAI API');
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
