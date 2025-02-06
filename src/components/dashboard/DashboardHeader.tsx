@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -8,13 +7,14 @@ export function DashboardHeader() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col space-y-6 pb-8">
-      <div className="flex justify-between items-center">
+    <div className="flex flex-col border-b pb-6">
+      <div className="container flex justify-between items-center">
         <GreetingHeader />
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Button
             onClick={() => navigate("/transactions/import")}
             variant="outline"
+            size="sm"
             className="gap-2"
           >
             <Upload className="h-4 w-4" />

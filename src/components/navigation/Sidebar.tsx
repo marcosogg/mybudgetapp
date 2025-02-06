@@ -40,66 +40,74 @@ export const Sidebar = () => {
   };
 
   return (
-    <div className="h-full p-4 space-y-4 flex flex-col bg-background">
-      <div className="mb-8">
+    <div className="h-full flex flex-col bg-background border-r">
+      <div className="shrink-0 p-6">
         <img 
           src="/MyBudget-logo.svg"
-          alt="MyBudget Logo" 
+          alt="MyBudget Logo"
+          className="h-16 w-auto"
         />
       </div>
-      <nav className="space-y-1.5">
-        {navigation.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Button
-              key={item.name}
-              variant={isActive ? "default" : "ghost"}
-              className={cn(
-                "nav-item w-full justify-start gap-2",
-                isActive && "nav-item-active"
-              )}
-              onClick={() => navigate(item.href)}
-            >
-              <item.icon className={cn("h-5 w-5", isActive && "text-[#1877F2]")} />
-              {item.name}
-            </Button>
-          );
-        })}
-      </nav>
-      <div className="mt-auto pt-4 border-t border-border">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="icon" variant="ghost" className="w-full flex justify-between px-2">
-              <div className="flex items-center gap-2">
-                <CircleUserRound size={20} className="text-muted-foreground" />
-                <span className="text-sm font-medium">Account</span>
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-64" align="start" alignOffset={11} sideOffset={8}>
-            <DropdownMenuLabel className="flex items-start gap-3">
-              <CircleUserRound size={32} className="shrink-0 text-muted-foreground" />
-              <div className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-medium text-foreground">
-                  {profile?.name}
-                </span>
-                <span className="truncate text-xs font-normal text-muted-foreground">
-                  {profile?.email}
-                </span>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => navigate("/settings")}>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleLogout}>
-                <span>Logout</span>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      
+      <div className="flex flex-col h-full">
+        <nav className="px-4 space-y-1">
+          {navigation.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Button
+                key={item.name}
+                variant={isActive ? "secondary" : "ghost"}
+                className={cn(
+                  "w-full justify-start gap-3 h-10 px-3 text-sm font-medium transition-colors",
+                  isActive ? "bg-secondary hover:bg-secondary/80" : "hover:bg-secondary/10"
+                )}
+                onClick={() => navigate(item.href)}
+              >
+                <item.icon className={cn("h-4 w-4", isActive ? "text-primary" : "text-muted-foreground")} />
+                {item.name}
+              </Button>
+            );
+          })}
+        </nav>
+
+        <div className="mt-4 px-4">
+          <div className="border-t mb-4" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="icon" variant="ghost" className="w-full flex justify-between px-2">
+                <div className="flex items-center gap-2">
+                  <CircleUserRound size={20} className="text-muted-foreground" />
+                  <span className="text-sm font-medium">Account</span>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-64" align="start" alignOffset={11} sideOffset={8}>
+              <DropdownMenuLabel className="flex items-center gap-3 px-3 py-2">
+                <CircleUserRound className="h-8 w-8 text-muted-foreground" />
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm font-medium leading-none">
+                    {profile?.name}
+                  </span>
+                  <span className="text-xs text-muted-foreground">
+                    {profile?.email}
+                  </span>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem onClick={() => navigate("/settings")} className="gap-3">
+                  <Settings className="h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout} className="gap-3">
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        <div className="flex-1"></div>
       </div>
     </div>
   );

@@ -13,11 +13,12 @@ export function GreetingHeader() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-1">
-      <h2 className="text-2xl font-semibold tracking-tight">
-        {greeting.text} {profile?.name} <greeting.icon className="inline-block h-5 w-5 ml-1" />
-      </h2>
-      <p className="text-muted-foreground">
+    <div className="flex flex-col">
+      <h1 className="text-2xl font-semibold tracking-tight flex items-center gap-2">
+        {greeting.text} {profile?.name}
+        <greeting.icon className="h-5 w-5 text-primary" />
+      </h1>
+      <p className="text-sm text-muted-foreground">
         Welcome to your financial dashboard
       </p>
     </div>
