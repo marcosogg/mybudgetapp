@@ -1,8 +1,8 @@
+
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { GreetingHeader } from "./GreetingHeader";
-import { UserAvatar } from "./UserAvatar";
 
 export function DashboardHeader() {
   const navigate = useNavigate();
