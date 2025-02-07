@@ -1,8 +1,9 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { SavingsGoal, SavingsProgress, SavingsGoalFormValues } from "@/types/savings";
 import { SavingsGoalService } from "@/lib/savings/savingsGoalService";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 
 const savingsGoalService = new SavingsGoalService();
 
