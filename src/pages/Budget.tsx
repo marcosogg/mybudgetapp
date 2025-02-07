@@ -10,8 +10,10 @@ const Budget = () => {
       </div>
 
       <div className="grid gap-6">
-        <IncomeSection />
-        <SavingsSummary />
+        <div className="grid gap-6 sm:grid-cols-2">
+          <IncomeSection />
+          <SavingsSummary />
+        </div>
         <BudgetSection />
       </div>
     </div>
