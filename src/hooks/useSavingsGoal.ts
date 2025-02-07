@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { SavingsGoal, SavingsProgress, SavingsGoalFormValues } from "@/types/savings";
 import { SavingsGoalService } from "@/lib/savings/savingsGoalService";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 const savingsGoalService = new SavingsGoalService();
 
@@ -32,10 +33,14 @@ export function useSavingsGoal() {
   // Create goal mutation
   const createGoal = useMutation({
     mutationFn: async (values: SavingsGoalFormValues) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
       const goalData = {
+        user_id: user.id,
         goal_type: values.goal_type,
         target_amount: parseFloat(values.target_amount),
-        recurring_amount: values.recurring_amount ? parseFloat(values.recurring_amount) : undefined,
+        recurring_amount: values.recurring_amount ? parseFloat(values.recurring_amount) : null,
         period_start: values.period_start,
         period_end: values.period_end,
         notes: values.notes
@@ -107,4 +112,4 @@ export function useSavingsGoal() {
     updateGoal,
     endCurrentGoal,
   };
-} 
+}
