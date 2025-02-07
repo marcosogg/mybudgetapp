@@ -1,6 +1,7 @@
-
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 import { Edit2, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -16,48 +17,109 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DatePicker } from "@/components/ui/date-picker";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useSavingsGoal } from "@/hooks/useSavingsGoal";
-import type { SavingsGoalFormValues, SavingsGoalCategory, SavingsGoalType } from "@/types/savings";
-import { savingsGoalSchema } from "@/types/savings";
+import { z } from "zod";
+import type { SavingsGoal } from "@/types/savings";
 
-const GOAL_TYPE_LABELS: Record<SavingsGoalType, string> = {
-  one_time: "One-time Goal",
-  recurring_monthly: "Monthly Recurring",
-  recurring_yearly: "Yearly Recurring"
-};
+const savingsGoalSchema = z.object({
+  target_amount: z.string()
+    .min(1, "Target amount is required")
+    .refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, "Must be a positive number"),
+  start_date: z.date(),
+  end_date: z.date().optional(),
+  notes: z.string().optional(),
+});
 
-const GOAL_CATEGORIES: Record<SavingsGoalCategory, string> = {
-  general: "General Savings",
-  emergency: "Emergency Fund",
-  retirement: "Retirement",
-  house: "House/Property",
-  car: "Vehicle",
-  education: "Education",
-  vacation: "Vacation",
-  other: "Other"
-};
+type SavingsGoalFormValues = z.infer<typeof savingsGoalSchema>;
 
 export function SavingsGoalsCard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { currentGoal, createGoal, updateGoal, endCurrentGoal } = useSavingsGoal();
+  const queryClient = useQueryClient();
 
   const form = useForm<SavingsGoalFormValues>({
     resolver: zodResolver(savingsGoalSchema),
     defaultValues: {
-      goal_type: 'one_time',
       target_amount: "",
-      period_start: new Date(),
-      category: 'general',
-      priority: 0
+      start_date: new Date(),
+      notes: "",
+    },
+  });
+
+  const { data: savingsData } = useQuery({
+    queryKey: ["savings-trend"],
+    enabled: false,
+  });
+
+  const { data: currentGoal, isLoading } = useQuery({
+    queryKey: ["current-savings-goal"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase
+        .from("savings_goals")
+        .select("*")
+        .eq("user_id", user.id)
+        .is("end_date", null)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (data) {
+        // Calculate progress based on total savings
+        const progress = savingsData?.yearTotal 
+          ? (savingsData.yearTotal / data.target_amount) * 100
+          : 0;
+        
+        return { ...data, progress } as SavingsGoal;
+      }
+
+      return null;
+    },
+  });
+
+  const createGoal = useMutation({
+    mutationFn: async (values: SavingsGoalFormValues) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // If there's an existing active goal, end it
+      if (currentGoal) {
+        await supabase
+          .from("savings_goals")
+          .update({ end_date: format(new Date(), "yyyy-MM-dd") })
+          .eq("id", currentGoal.id);
+      }
+
+      // Create new goal
+      const { data, error } = await supabase
+        .from("savings_goals")
+        .insert([
+          {
+            user_id: user.id,
+            target_amount: parseFloat(values.target_amount),
+            start_date: format(values.start_date, "yyyy-MM-dd"),
+            end_date: values.end_date ? format(values.end_date, "yyyy-MM-dd") : null,
+            notes: values.notes?.trim() || null,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["current-savings-goal"] });
+      queryClient.invalidateQueries({ queryKey: ["savings-trend"] });
+      toast.success("Savings goal updated successfully");
+      setIsDialogOpen(false);
+      form.reset();
+    },
+    onError: (error) => {
+      toast.error("Failed to update savings goal");
+      console.error("Error updating savings goal:", error);
     },
   });
 
@@ -65,19 +127,19 @@ export function SavingsGoalsCard() {
     setIsDialogOpen(open);
     if (open && currentGoal) {
       form.reset({
-        goal_type: currentGoal.goal_type,
         target_amount: currentGoal.target_amount.toString(),
-        recurring_amount: currentGoal.recurring_amount?.toString(),
-        period_start: new Date(currentGoal.period_start),
-        period_end: currentGoal.period_end ? new Date(currentGoal.period_end) : undefined,
-        notes: currentGoal.notes,
-        category: currentGoal.category,
-        priority: currentGoal.priority
+        start_date: new Date(currentGoal.start_date),
+        end_date: currentGoal.end_date ? new Date(currentGoal.end_date) : undefined,
+        notes: currentGoal.notes || "",
       });
     } else if (!open) {
       form.reset();
     }
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="space-y-4">
@@ -117,44 +179,6 @@ export function SavingsGoalsCard() {
             </DialogHeader>
             <form onSubmit={form.handleSubmit((values) => createGoal.mutate(values))} className="space-y-4">
               <div className="space-y-2">
-                <Label>Goal Type</Label>
-                <Select
-                  value={form.watch("goal_type")}
-                  onValueChange={(value: SavingsGoalType) => form.setValue("goal_type", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a goal type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(GOAL_TYPE_LABELS).map(([type, label]) => (
-                      <SelectItem key={type} value={type}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>Category</Label>
-                <Select
-                  value={form.watch("category")}
-                  onValueChange={(value: SavingsGoalCategory) => form.setValue("category", value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(GOAL_CATEGORIES).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="target_amount">Target Amount</Label>
                 <Input
                   {...form.register("target_amount")}
@@ -164,67 +188,23 @@ export function SavingsGoalsCard() {
                   placeholder="Enter target amount"
                 />
                 {form.formState.errors.target_amount && (
-                  <p className="text-sm text-destructive">
-                    {form.formState.errors.target_amount.message}
-                  </p>
+                  <p className="text-sm text-destructive">{form.formState.errors.target_amount.message}</p>
                 )}
               </div>
-
-              {form.watch("goal_type") !== 'one_time' && (
-                <div className="space-y-2">
-                  <Label htmlFor="recurring_amount">
-                    {form.watch("goal_type") === 'recurring_monthly' ? 'Monthly' : 'Yearly'} Target
-                  </Label>
-                  <Input
-                    {...form.register("recurring_amount")}
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder={`Enter ${form.watch("goal_type") === 'recurring_monthly' ? 'monthly' : 'yearly'} target`}
-                  />
-                  {form.formState.errors.recurring_amount && (
-                    <p className="text-sm text-destructive">
-                      {form.formState.errors.recurring_amount.message}
-                    </p>
-                  )}
-                </div>
-              )}
-
               <div className="space-y-2">
                 <Label>Start Date</Label>
                 <DatePicker
-                  date={form.watch("period_start")}
-                  onChange={(date) => date && form.setValue("period_start", date)}
+                  date={form.watch("start_date")}
+                  onChange={(date) => date && form.setValue("start_date", date)}
                 />
               </div>
-
-              {form.watch("goal_type") === 'one_time' && (
-                <div className="space-y-2">
-                  <Label>End Date</Label>
-                  <DatePicker
-                    date={form.watch("period_end")}
-                    onChange={(date) => form.setValue("period_end", date)}
-                  />
-                  {form.formState.errors.period_end && (
-                    <p className="text-sm text-destructive">
-                      End date is required for one-time goals
-                    </p>
-                  )}
-                </div>
-              )}
-
               <div className="space-y-2">
-                <Label htmlFor="priority">Priority (0-10)</Label>
-                <Input
-                  {...form.register("priority", { valueAsNumber: true })}
-                  type="number"
-                  min="0"
-                  max="10"
-                  step="1"
-                  placeholder="Enter priority (0 = lowest)"
+                <Label>End Date (Optional)</Label>
+                <DatePicker
+                  date={form.watch("end_date")}
+                  onChange={(date) => form.setValue("end_date", date)}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="notes">Notes (Optional)</Label>
                 <Input
@@ -232,34 +212,17 @@ export function SavingsGoalsCard() {
                   placeholder="Add notes about your goal"
                 />
               </div>
-
-              <div className="flex gap-2 justify-end">
-                {currentGoal && (
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => endCurrentGoal.mutate()}
-                    disabled={endCurrentGoal.isPending}
-                  >
-                    End Goal
-                  </Button>
-                )}
-                <Button
-                  type="submit"
-                  disabled={createGoal.isPending || updateGoal.isPending || !form.formState.isValid}
-                >
-                  {createGoal.isPending || updateGoal.isPending
-                    ? "Saving..."
-                    : currentGoal
-                    ? "Update Goal"
-                    : "Create Goal"}
-                </Button>
-              </div>
+              <Button 
+                type="submit" 
+                className="w-full"
+                disabled={createGoal.isPending || !form.formState.isValid}
+              >
+                {createGoal.isPending ? "Saving..." : "Save Goal"}
+              </Button>
             </form>
           </DialogContent>
         </Dialog>
       </div>
-
       {currentGoal && (
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
@@ -267,22 +230,11 @@ export function SavingsGoalsCard() {
             <span>{currentGoal.progress?.toFixed(1)}%</span>
           </div>
           <Progress value={currentGoal.progress || 0} className="h-2" />
-          <div className="mt-2 space-y-1">
-            <p className="text-sm">
-              <span className="font-medium">Category:</span>{" "}
-              {GOAL_CATEGORIES[currentGoal.category]}
-            </p>
-            {currentGoal.priority > 0 && (
-              <p className="text-sm">
-                <span className="font-medium">Priority:</span> {currentGoal.priority}
-              </p>
-            )}
-            {currentGoal.notes && (
-              <p className="text-sm text-muted-foreground">{currentGoal.notes}</p>
-            )}
-          </div>
+          {currentGoal.notes && (
+            <p className="text-sm text-muted-foreground mt-2">{currentGoal.notes}</p>
+          )}
         </div>
       )}
     </div>
   );
-}
+} 

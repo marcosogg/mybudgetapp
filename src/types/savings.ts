@@ -1,10 +1,7 @@
-
 import { z } from "zod";
 
 // Basic type definitions
 export type SavingsGoalType = 'one_time' | 'recurring_monthly' | 'recurring_yearly';
-export type SavingsGoalStatus = 'active' | 'completed' | 'cancelled';
-export type SavingsGoalCategory = 'general' | 'emergency' | 'retirement' | 'house' | 'car' | 'education' | 'vacation' | 'other';
 
 export interface SavingsGoal {
   id: string;
@@ -16,9 +13,6 @@ export interface SavingsGoal {
   period_end?: Date;
   notes?: string;
   created_at: Date;
-  status: SavingsGoalStatus;
-  priority: number;
-  category: SavingsGoalCategory;
   progress?: number;
 }
 
@@ -62,8 +56,6 @@ export interface SavingsGoalFormData {
   period_start: Date;
   period_end?: Date;
   notes?: string;
-  category: SavingsGoalCategory;
-  priority: number;
 }
 
 // Validation schemas
@@ -78,8 +70,6 @@ export const savingsGoalSchema = z.object({
   period_start: z.date(),
   period_end: z.date().optional(),
   notes: z.string().optional(),
-  category: z.enum(['general', 'emergency', 'retirement', 'house', 'car', 'education', 'vacation', 'other']).default('general'),
-  priority: z.number().int().min(0).default(0)
 }).refine(data => {
   if (data.goal_type === 'one_time' && !data.period_end) {
     return false;
@@ -92,4 +82,4 @@ export const savingsGoalSchema = z.object({
   message: "End date is required for one-time goals, and recurring amount is required for recurring goals"
 });
 
-export type SavingsGoalFormValues = z.infer<typeof savingsGoalSchema>;
+export type SavingsGoalFormValues = z.infer<typeof savingsGoalSchema>; 
