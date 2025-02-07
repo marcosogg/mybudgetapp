@@ -1,3 +1,4 @@
+
 import { render, screen } from '@testing-library/react';
 import { SavingsChart } from '../SavingsChart';
 import { useSavingsData } from '../hooks/useSavingsData';

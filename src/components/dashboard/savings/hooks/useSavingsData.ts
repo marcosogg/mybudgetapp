@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { format, startOfYear, addMonths } from "date-fns";
 import type { SavingsChartData, MonthlySavingsData, SavingsProjection } from "@/types/savings";
 import type { Database } from "@/types/supabase";
+import { calculateTrendIndicator, calculateProjections } from "../utils/calculations";
 
 type Tables = Database['public']['Tables'];
 type SavingsGoalRow = Tables['savings_goals']['Row'];
@@ -157,6 +158,8 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
 export function useSavingsData() {
   return useQuery<SavingsChartData, Error>({
     queryKey: ["savings-trend"],
-    queryFn: fetchSavingsData,
+    queryFn: async () => {
+      return fetchSavingsData();
+    },
   });
 }
