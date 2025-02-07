@@ -8,6 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
+import { BankLogo } from "@/components/transactions/import/BankLogo";
 
 const TransactionImport = () => {
   const navigate = useNavigate();
@@ -57,7 +58,8 @@ const TransactionImport = () => {
       <Alert>
         <AlertDescription className="flex items-center gap-2">
           Current import type:{" "}
-          <Badge variant="outline" className="text-sm">
+          <Badge variant="outline" className="flex items-center gap-1.5 text-sm">
+            <BankLogo bank={profile.statement_format} />
             {profile.statement_format.toUpperCase()}
           </Badge>
         </AlertDescription>
