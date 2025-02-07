@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import type { SavingsGoal, SavingsProgress } from "@/types/savings";
 import { calculateSavingsProgress } from "./calculations";
@@ -8,7 +9,7 @@ export class SavingsGoalService {
    * Create a new savings goal
    */
   async createGoal(
-    goal: Omit<SavingsGoal, 'id' | 'created_at' | 'progress'>
+    goal: Omit<SavingsGoal, 'id' | 'created_at' | 'progress' | 'user_id' | 'status'>
   ): Promise<SavingsGoal> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
@@ -27,7 +28,10 @@ export class SavingsGoalService {
         recurring_amount: goal.recurring_amount,
         period_start: format(goal.period_start, 'yyyy-MM-dd'),
         period_end: goal.period_end ? format(goal.period_end, 'yyyy-MM-dd') : null,
-        notes: goal.notes
+        notes: goal.notes,
+        category: goal.category,
+        priority: goal.priority,
+        status: 'active'
       })
       .select()
       .single();
@@ -41,7 +45,7 @@ export class SavingsGoalService {
    */
   async updateGoal(
     id: string,
-    goal: Partial<Omit<SavingsGoal, 'id' | 'created_at' | 'progress'>>
+    goal: Partial<Omit<SavingsGoal, 'id' | 'created_at' | 'progress' | 'user_id'>>
   ): Promise<SavingsGoal> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
@@ -76,7 +80,8 @@ export class SavingsGoalService {
       .from("savings_goals")
       .select("*")
       .eq("user_id", user.id)
-      .is("period_end", null)
+      .eq("status", "active")
+      .order('priority', { ascending: false })
       .order('created_at', { ascending: false })
       .maybeSingle();
 
@@ -123,10 +128,13 @@ export class SavingsGoalService {
   private async endActiveRecurringGoal(userId: string, goalType: string): Promise<void> {
     const { error } = await supabase
       .from("savings_goals")
-      .update({ period_end: format(new Date(), 'yyyy-MM-dd') })
+      .update({ 
+        status: 'completed',
+        period_end: format(new Date(), 'yyyy-MM-dd') 
+      })
       .eq("user_id", userId)
       .eq("goal_type", goalType)
-      .is("period_end", null);
+      .eq("status", "active");
 
     if (error) throw error;
   }
@@ -144,7 +152,10 @@ export class SavingsGoalService {
       period_start: new Date(data.period_start),
       period_end: data.period_end ? new Date(data.period_end) : undefined,
       notes: data.notes,
-      created_at: new Date(data.created_at)
+      created_at: new Date(data.created_at),
+      status: data.status,
+      priority: data.priority,
+      category: data.category
     };
   }
 
@@ -176,4 +187,4 @@ export class SavingsGoalService {
     if (createError) throw createError;
     return newCategory.id;
   }
-} 
+}
