@@ -1,25 +1,18 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { DatePicker } from "@/components/ui/date-picker";
 import { Textarea } from "@/components/ui/textarea";
 import { useSavingsGoal } from "@/hooks/useSavingsGoal";
-import { GOAL_TYPE_LABELS, GOAL_TYPE_DESCRIPTIONS } from "@/lib/savings/constants";
 import type { SavingsGoal, SavingsGoalType } from "@/types/savings";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { savingsGoalSchema } from "@/types/savings";
 import type { SavingsGoalFormValues } from "@/types/savings";
 import { useState } from "react";
+import { GoalTypeSelect } from "./form/GoalTypeSelect";
+import { GoalAmountInput } from "./form/GoalAmountInput";
+import { GoalDateFields } from "./form/GoalDateFields";
 
 interface SavingsGoalDialogProps {
   open: boolean;
@@ -87,90 +80,27 @@ export function SavingsGoalDialog({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label>Goal Type</Label>
-            <Select
-              value={selectedType}
-              onValueChange={(value: SavingsGoalType) => {
-                setSelectedType(value);
-                form.setValue("goal_type", value);
-              }}
-              disabled={mode === 'edit'}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a goal type" />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(GOAL_TYPE_LABELS).map(([type, label]) => (
-                  <SelectItem key={type} value={type}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <p className="text-sm text-muted-foreground">
-              {GOAL_TYPE_DESCRIPTIONS[selectedType]}
-            </p>
-          </div>
+          <GoalTypeSelect
+            value={selectedType}
+            onChange={(value) => {
+              setSelectedType(value);
+              form.setValue("goal_type", value);
+            }}
+            disabled={mode === 'edit'}
+          />
 
-          {selectedType === 'one_time' ? (
-            <div className="space-y-2">
-              <Label htmlFor="target_amount">Target Amount</Label>
-              <Input
-                {...form.register("target_amount")}
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="Enter target amount"
-              />
-              {form.formState.errors.target_amount && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.target_amount.message}
-                </p>
-              )}
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <Label htmlFor="recurring_amount">
-                {selectedType === 'recurring_monthly' ? 'Monthly' : 'Yearly'} Target
-              </Label>
-              <Input
-                {...form.register("recurring_amount")}
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder={`Enter ${selectedType === 'recurring_monthly' ? 'monthly' : 'yearly'} target`}
-              />
-              {form.formState.errors.recurring_amount && (
-                <p className="text-sm text-destructive">
-                  {form.formState.errors.recurring_amount.message}
-                </p>
-              )}
-            </div>
-          )}
+          <GoalAmountInput
+            goalType={selectedType}
+            register={form.register}
+            errors={form.formState.errors}
+          />
 
-          <div className="space-y-2">
-            <Label>Start Date</Label>
-            <DatePicker
-              date={form.watch("period_start")}
-              onChange={(date) => date && form.setValue("period_start", date)}
-            />
-          </div>
-
-          {selectedType === 'one_time' && (
-            <div className="space-y-2">
-              <Label>End Date</Label>
-              <DatePicker
-                date={form.watch("period_end")}
-                onChange={(date) => form.setValue("period_end", date)}
-              />
-              {form.formState.errors.period_end && (
-                <p className="text-sm text-destructive">
-                  End date is required for one-time goals
-                </p>
-              )}
-            </div>
-          )}
+          <GoalDateFields
+            goalType={selectedType}
+            watch={form.watch}
+            setValue={form.setValue}
+            errors={form.formState.errors}
+          />
 
           <div className="space-y-2">
             <Label htmlFor="notes">Notes (Optional)</Label>

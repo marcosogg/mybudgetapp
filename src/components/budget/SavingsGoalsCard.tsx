@@ -21,13 +21,20 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { SavingsGoal } from "@/types/savings";
+import { GOAL_TYPE_LABELS } from "@/lib/savings/constants";
+import { SavingsDialog } from "./SavingsDialog";
+import { useMonth } from "@/contexts/MonthContext";
+
+interface SavingsTrendData {
+  yearTotal: number;
+}
 
 const savingsGoalSchema = z.object({
   target_amount: z.string()
     .min(1, "Target amount is required")
     .refine(val => !isNaN(parseFloat(val)) && parseFloat(val) > 0, "Must be a positive number"),
-  start_date: z.date(),
-  end_date: z.date().optional(),
+  period_start: z.date(),
+  period_end: z.date().optional(),
   notes: z.string().optional(),
 });
 
@@ -36,17 +43,19 @@ type SavingsGoalFormValues = z.infer<typeof savingsGoalSchema>;
 export function SavingsGoalsCard() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { selectedMonth } = useMonth();
+  const [isEditing, setIsEditing] = useState(false);
 
   const form = useForm<SavingsGoalFormValues>({
     resolver: zodResolver(savingsGoalSchema),
     defaultValues: {
       target_amount: "",
-      start_date: new Date(),
+      period_start: new Date(),
       notes: "",
     },
   });
 
-  const { data: savingsData } = useQuery({
+  const { data: savingsData } = useQuery<SavingsTrendData>({
     queryKey: ["savings-trend"],
     enabled: false,
   });
@@ -61,7 +70,7 @@ export function SavingsGoalsCard() {
         .from("savings_goals")
         .select("*")
         .eq("user_id", user.id)
-        .is("end_date", null)
+        .is("period_end", null)
         .maybeSingle();
 
       if (error) throw error;
@@ -88,7 +97,7 @@ export function SavingsGoalsCard() {
       if (currentGoal) {
         await supabase
           .from("savings_goals")
-          .update({ end_date: format(new Date(), "yyyy-MM-dd") })
+          .update({ period_end: format(new Date(), "yyyy-MM-dd") })
           .eq("id", currentGoal.id);
       }
 
@@ -99,8 +108,8 @@ export function SavingsGoalsCard() {
           {
             user_id: user.id,
             target_amount: parseFloat(values.target_amount),
-            start_date: format(values.start_date, "yyyy-MM-dd"),
-            end_date: values.end_date ? format(values.end_date, "yyyy-MM-dd") : null,
+            period_start: format(values.period_start, "yyyy-MM-dd"),
+            period_end: values.period_end ? format(values.period_end, "yyyy-MM-dd") : null,
             notes: values.notes?.trim() || null,
           },
         ])
@@ -128,14 +137,92 @@ export function SavingsGoalsCard() {
     if (open && currentGoal) {
       form.reset({
         target_amount: currentGoal.target_amount.toString(),
-        start_date: new Date(currentGoal.start_date),
-        end_date: currentGoal.end_date ? new Date(currentGoal.end_date) : undefined,
+        period_start: new Date(currentGoal.period_start),
+        period_end: currentGoal.period_end ? new Date(currentGoal.period_end) : undefined,
         notes: currentGoal.notes || "",
       });
     } else if (!open) {
       form.reset();
     }
   };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleDialogClose = (open: boolean) => {
+    setIsEditing(open);
+  };
+
+  const { data: monthlySavings } = useQuery({
+    queryKey: ["monthly-savings", format(selectedMonth, "yyyy-MM")],
+    queryFn: async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          toast.error("User not authenticated");
+          throw new Error("User not authenticated");
+        }
+
+        // Get the savings category ID first
+        const { data: existingCategory, error: categoryError } = await supabase
+          .from("categories")
+          .select("id")
+          .eq("user_id", user.id)
+          .eq("name", "Savings")
+          .maybeSingle();
+
+        if (categoryError) {
+          console.error("Category fetch error:", categoryError);
+          throw categoryError;
+        }
+
+        let categoryId;
+        if (!existingCategory) {
+          // Create the Savings category if it doesn't exist
+          const { data: newCategory, error: createError } = await supabase
+            .from("categories")
+            .insert({ name: "Savings", user_id: user.id })
+            .select("id")
+            .single();
+            
+          if (createError) {
+            console.error("Category creation error:", createError);
+            throw createError;
+          }
+          categoryId = newCategory.id;
+        } else {
+          categoryId = existingCategory.id;
+        }
+
+        // Get current month's savings
+        const currentMonthStart = format(selectedMonth, "yyyy-MM-01");
+        const nextMonthStart = format(
+          new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 1),
+          "yyyy-MM-dd"
+        );
+
+        const { data: currentMonthData, error: currentError } = await supabase
+          .from("transactions")
+          .select("amount")
+          .eq("category_id", categoryId)
+          .eq("user_id", user.id)
+          .gte("date", currentMonthStart)
+          .lt("date", nextMonthStart);
+
+        if (currentError) {
+          console.error("Transactions fetch error:", currentError);
+          throw currentError;
+        }
+
+        return currentMonthData?.reduce((sum, t) => sum + Math.abs(t.amount || 0), 0) || 0;
+      } catch (error) {
+        console.error("Monthly savings fetch error:", error);
+        toast.error("Failed to load monthly savings data");
+        throw error;
+      }
+    },
+  });
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -194,15 +281,15 @@ export function SavingsGoalsCard() {
               <div className="space-y-2">
                 <Label>Start Date</Label>
                 <DatePicker
-                  date={form.watch("start_date")}
-                  onChange={(date) => date && form.setValue("start_date", date)}
+                  date={form.watch("period_start")}
+                  onChange={(date) => date && form.setValue("period_start", date)}
                 />
               </div>
               <div className="space-y-2">
                 <Label>End Date (Optional)</Label>
                 <DatePicker
-                  date={form.watch("end_date")}
-                  onChange={(date) => form.setValue("end_date", date)}
+                  date={form.watch("period_end")}
+                  onChange={(date) => form.setValue("period_end", date)}
                 />
               </div>
               <div className="space-y-2">
@@ -237,4 +324,4 @@ export function SavingsGoalsCard() {
       )}
     </div>
   );
-} 
+}
