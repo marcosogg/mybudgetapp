@@ -1,8 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfYear, format } from "date-fns";
-import type { SavingsChartData, MonthlySavingsData } from "@/types/savings";
-import { calculateProjections, calculateTrendIndicator } from "../utils/calculations";
+import { format, startOfYear, addMonths } from "date-fns";
+import type { SavingsChartData, MonthlySavingsData, SavingsProjection } from "@/types/savings";
+import type { Database } from "@/types/supabase";
+
+type Tables = Database['public']['Tables'];
+type SavingsGoalRow = Tables['savings_goals']['Row'];
+type CategoryRow = Tables['categories']['Row'];
+type TransactionRow = Tables['transactions']['Row'];
 
 async function fetchSavingsData(): Promise<SavingsChartData> {
   // Check authentication first
@@ -43,7 +48,7 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
   // Get current savings goal
   const { data: goalData, error: goalError } = await supabase
     .from("savings_goals")
-    .select("id, user_id, target_amount, start_date, end_date, notes, created_at")
+    .select("id, user_id, target_amount, start_date, end_date, notes, created_at, goal_type, recurring_amount, period_start, period_end, status, priority, category")
     .eq("user_id", user.id)
     .is("end_date", null)
     .maybeSingle();
@@ -63,11 +68,16 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
   const currentGoal = goalData ? {
     id: goalData.id,
     user_id: goalData.user_id,
+    goal_type: goalData.goal_type,
     target_amount: Number(goalData.target_amount),
-    start_date: goalData.start_date,
-    end_date: goalData.end_date,
+    recurring_amount: goalData.recurring_amount ? Number(goalData.recurring_amount) : undefined,
+    period_start: new Date(goalData.period_start),
+    period_end: goalData.period_end ? new Date(goalData.period_end) : undefined,
     notes: goalData.notes,
-    created_at: goalData.created_at
+    created_at: new Date(goalData.created_at),
+    status: goalData.status,
+    priority: goalData.priority,
+    category: goalData.category
   } : null;
 
   // Get this year's savings data
@@ -149,4 +159,4 @@ export function useSavingsData() {
     queryKey: ["savings-trend"],
     queryFn: fetchSavingsData,
   });
-} 
+}

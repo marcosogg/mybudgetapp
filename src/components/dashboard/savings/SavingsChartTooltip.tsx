@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { TooltipProps } from "recharts";
+import type { TooltipProps as RechartsTooltipProps } from "recharts";
 import type { TrendIndicator } from "./utils/calculations";
+import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 
 interface TooltipData {
   month: string;
@@ -16,7 +17,7 @@ export function SavingsChartTooltip({
   active, 
   payload,
   goalAmount = 0
-}: TooltipProps & { goalAmount?: number }) {
+}: RechartsTooltipProps<ValueType, NameType> & { goalAmount?: number }) {
   if (!active || !payload || !payload.length) return null;
 
   const data = payload[0].payload as TooltipData;
@@ -69,4 +70,4 @@ export function SavingsChartTooltip({
       )}
     </Card>
   );
-} 
+}

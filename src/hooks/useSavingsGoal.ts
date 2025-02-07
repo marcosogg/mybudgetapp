@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { SavingsGoal, SavingsProgress, SavingsGoalFormValues } from "@/types/savings";
 import { SavingsGoalService } from "@/lib/savings/savingsGoalService";
@@ -38,7 +39,10 @@ export function useSavingsGoal() {
         recurring_amount: values.recurring_amount ? parseFloat(values.recurring_amount) : undefined,
         period_start: values.period_start,
         period_end: values.period_end,
-        notes: values.notes
+        notes: values.notes,
+        category: values.category || 'general',
+        priority: values.priority || 0,
+        status: 'active' as const
       };
 
       return savingsGoalService.createGoal(goalData);
@@ -96,15 +100,12 @@ export function useSavingsGoal() {
   });
 
   return {
-    // Queries
     currentGoal,
     progress,
     isLoading: isLoadingGoal || isLoadingProgress,
     error: goalError || progressError,
-
-    // Mutations
     createGoal,
     updateGoal,
     endCurrentGoal,
   };
-} 
+}

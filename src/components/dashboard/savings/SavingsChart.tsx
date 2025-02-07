@@ -1,3 +1,4 @@
+
 import { 
   Bar, 
   BarChart, 
@@ -107,7 +108,7 @@ export function SavingsChart() {
             <Bar
               dataKey="amount"
               fill="hsl(var(--primary))"
-              radius={CHART_CONSTANTS.BAR_RADIUS}
+              radius={[4, 4, 0, 0]} // Fix: Convert readonly array to mutable array
               fillOpacity={CHART_CONSTANTS.FILL_OPACITY}
               isAnimationActive={false}
             />
@@ -135,4 +136,4 @@ export function SavingsChart() {
       )}
     </Card>
   );
-} 
+}
