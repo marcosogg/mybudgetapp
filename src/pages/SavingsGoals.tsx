@@ -11,7 +11,6 @@ export default function SavingsGoals() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   return (
-    <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <PageHeader 
@@ -32,6 +31,5 @@ export default function SavingsGoals() {
           mode="create"
         />
       </div>
-    </DashboardLayout>
   );
 }
