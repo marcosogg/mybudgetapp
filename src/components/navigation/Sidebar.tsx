@@ -1,4 +1,5 @@
-import { Home, PieChart, List, Bell, Wallet } from "lucide-react";
+
+import { Home, PieChart, List, Bell, Wallet, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export const Sidebar = () => {
     { name: "Transactions", href: "/transactions", icon: List },
     { name: "Categories", href: "/categories", icon: PieChart },
     { name: "Budget", href: "/budget", icon: Wallet },
+    { name: "Savings Goals", href: "/savings-goals", icon: Target },
     { name: "Reminders", href: "/reminders", icon: Bell },
   ];
 
@@ -76,7 +78,9 @@ export const Sidebar = () => {
             <DropdownMenuTrigger asChild>
               <Button size="icon" variant="ghost" className="w-full flex justify-between px-2">
                 <div className="flex items-center gap-2">
-                  <CircleUserRound size={20} className="text-muted-foreground" />
+                  <CircleUserRound size={20} className="text
+
+-muted-foreground" />
                   <span className="text-sm font-medium">Account</span>
                 </div>
               </Button>

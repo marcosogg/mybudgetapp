@@ -1,3 +1,4 @@
+
 import { RouteObject } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import Index from "@/pages/Index";
@@ -7,8 +8,8 @@ import Transactions from "@/pages/Transactions";
 import TransactionImport from "@/pages/TransactionImport";
 import Budget from "@/pages/Budget";
 import Reminders from "@/pages/Reminders";
-
 import Settings from "@/pages/Settings";
+import SavingsGoals from "@/pages/SavingsGoals";
 
 export const routes: RouteObject[] = [
   {
@@ -68,6 +69,14 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <Settings />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/savings-goals",
+    element: (
+      <ProtectedRoute>
+        <SavingsGoals />
       </ProtectedRoute>
     ),
   },
