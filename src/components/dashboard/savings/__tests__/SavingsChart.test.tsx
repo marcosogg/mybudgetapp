@@ -2,6 +2,7 @@
 import { render, screen } from '@testing-library/react';
 import { SavingsChart } from '../SavingsChart';
 import { useSavingsData } from '../hooks/useSavingsData';
+import { expect, describe, it, beforeEach, jest } from 'vitest';
 import '@testing-library/jest-dom';
 
 // Mock the custom hook
