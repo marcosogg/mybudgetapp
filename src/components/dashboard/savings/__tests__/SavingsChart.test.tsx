@@ -1,6 +1,8 @@
+
 import { render, screen } from '@testing-library/react';
 import { SavingsChart } from '../SavingsChart';
 import { useSavingsData } from '../hooks/useSavingsData';
+import '@testing-library/jest-dom';
 
 // Mock the custom hook
 jest.mock('../hooks/useSavingsData');
@@ -84,4 +86,4 @@ describe('SavingsChart', () => {
     render(<SavingsChart />);
     // Add appropriate error state checks based on your error handling UI
   });
-}); 
+});

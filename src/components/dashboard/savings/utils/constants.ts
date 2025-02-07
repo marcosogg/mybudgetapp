@@ -1,3 +1,4 @@
+
 export const CHART_CONSTANTS = {
   MARGIN: { top: 10, right: 30, left: 10, bottom: 0 },
   CHART_HEIGHT: 300,
@@ -10,4 +11,4 @@ export const CHART_CONSTANTS = {
   MIN_MONTHS_FOR_PROJECTION: 3,
   TREND_THRESHOLD: 10,
   MONTHS_TO_PROJECT: 2
-} as const; 
+} as const;

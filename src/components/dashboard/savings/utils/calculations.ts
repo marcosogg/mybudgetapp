@@ -1,3 +1,4 @@
+
 import type { MonthlySavingsData, SavingsProjection } from "@/types/savings";
 import { addMonths, format } from "date-fns";
 
@@ -36,4 +37,4 @@ export function calculateProjections(
   }
 
   return projections;
-} 
+}
