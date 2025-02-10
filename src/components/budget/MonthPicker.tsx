@@ -16,13 +16,28 @@ interface MonthPickerProps {
 }
 
 export function MonthPicker({ selectedMonth, onMonthChange, className }: MonthPickerProps) {
+  // Add validation and logging for debugging
+  console.log('MonthPicker - selectedMonth:', selectedMonth);
+  
+  if (!(selectedMonth instanceof Date) || isNaN(selectedMonth.getTime())) {
+    console.error('Invalid date provided to MonthPicker:', selectedMonth);
+    selectedMonth = new Date(); // Fallback to current date
+  }
+
   const handlePreviousMonth = () => {
-    onMonthChange(subMonths(selectedMonth, 1));
+    const newDate = subMonths(selectedMonth, 1);
+    console.log('Previous month:', newDate);
+    onMonthChange(newDate);
   };
 
   const handleNextMonth = () => {
-    onMonthChange(addMonths(selectedMonth, 1));
+    const newDate = addMonths(selectedMonth, 1);
+    console.log('Next month:', newDate);
+    onMonthChange(newDate);
   };
+
+  const formattedDate = format(selectedMonth, "MMMM yyyy");
+  console.log('Formatted date:', formattedDate);
 
   return (
     <Popover>
@@ -35,7 +50,7 @@ export function MonthPicker({ selectedMonth, onMonthChange, className }: MonthPi
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {format(selectedMonth, "MMMM yyyy")}
+          {formattedDate}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-2" align="start">
@@ -48,7 +63,7 @@ export function MonthPicker({ selectedMonth, onMonthChange, className }: MonthPi
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <div className="text-center font-medium">
-            {format(selectedMonth, "MMMM yyyy")}
+            {formattedDate}
           </div>
           <Button
             variant="outline"
