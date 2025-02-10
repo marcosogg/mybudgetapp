@@ -1,3 +1,4 @@
+
 # Changelog
 
 ## [Unreleased]
@@ -23,6 +24,9 @@
 - Improved import flow with user preferences validation
 
 ### Changed
+- Modified Create New Savings Goal form to use existing MonthPicker component for date selection
+- Improved consistency by reusing existing component
+- Maintained all existing form functionality
 - Enhanced CSV import to conditionally handle different statement formats
 - Improved error messages for format-specific validation
 - Updated import logic to check user's preferred statement format
@@ -47,3 +51,4 @@
 - Added comprehensive error handling for date parsing
 - Implemented defensive programming for date handling
 - Added support for multiple date format detection
+

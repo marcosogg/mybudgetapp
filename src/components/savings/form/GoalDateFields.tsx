@@ -1,14 +1,7 @@
 
 import { Label } from "@/components/ui/label";
-import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { MonthPicker } from "@/components/budget/MonthPicker";
 import type { SavingsGoalType } from "@/types/savings";
 import type { SavingsGoalFormValues } from "@/types/savings";
 import { UseFormWatch, UseFormSetValue, FieldErrors } from "react-hook-form";
@@ -22,11 +15,8 @@ interface GoalDateFieldsProps {
 }
 
 export function GoalDateFields({ goalType, watch, setValue, errors }: GoalDateFieldsProps) {
-  const handleMonthChange = (value: string) => {
-    const [year, month] = value.split("-").map(Number);
-    if (year && month) {
-      setValue("period_start", startOfMonth(new Date(year, month - 1)));
-    }
+  const handleMonthChange = (date: Date) => {
+    setValue("period_start", startOfMonth(date));
   };
 
   const handleYearChange = (value: string) => {
@@ -37,19 +27,14 @@ export function GoalDateFields({ goalType, watch, setValue, errors }: GoalDateFi
   };
 
   if (goalType === 'recurring_monthly') {
-    const currentValue = watch("period_start");
-    const monthValue = currentValue 
-      ? `${currentValue.getFullYear()}-${String(currentValue.getMonth() + 1).padStart(2, '0')}`
-      : "";
+    const currentValue = watch("period_start") || new Date();
 
     return (
       <div className="space-y-2">
         <Label>Start Month</Label>
-        <Input
-          type="month"
-          value={monthValue}
-          onChange={(e) => handleMonthChange(e.target.value)}
-          className="w-full"
+        <MonthPicker
+          selectedMonth={currentValue}
+          onMonthChange={handleMonthChange}
         />
       </div>
     );

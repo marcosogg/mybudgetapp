@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -6,18 +7,21 @@ import {
 } from "@/components/ui/popover";
 import { format, addMonths, subMonths } from "date-fns";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
-import { useMonth } from "@/contexts/MonthContext";
 import { cn } from "@/lib/utils";
 
-export function MonthPicker() {
-  const { selectedMonth, setSelectedMonth } = useMonth();
+interface MonthPickerProps {
+  selectedMonth: Date;
+  onMonthChange: (date: Date) => void;
+  className?: string;
+}
 
+export function MonthPicker({ selectedMonth, onMonthChange, className }: MonthPickerProps) {
   const handlePreviousMonth = () => {
-    setSelectedMonth(subMonths(selectedMonth, 1));
+    onMonthChange(subMonths(selectedMonth, 1));
   };
 
   const handleNextMonth = () => {
-    setSelectedMonth(addMonths(selectedMonth, 1));
+    onMonthChange(addMonths(selectedMonth, 1));
   };
 
   return (
@@ -26,7 +30,8 @@ export function MonthPicker() {
         <Button
           variant="outline"
           className={cn(
-            "w-[240px] justify-start text-left font-normal",
+            "w-full justify-start text-left font-normal",
+            className
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
