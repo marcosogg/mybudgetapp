@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { format } from "date-fns";
 import {
   Table,
@@ -11,20 +12,37 @@ import { Button } from "@/components/ui/button";
 import { Edit2, Trash2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import { SavingsGoalDialog } from "./SavingsGoalDialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { useSavings } from "@/features/savings/hooks/useSavings";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import type { SavingsGoal } from "@/features/savings/types/savings";
+import { SavingsService } from "../../api/service";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { SAVINGS_QUERY_KEYS } from "../../hooks/useSavings";
+import type { SavingsGoal } from "../../types/savings";
+import { SavingsGoalDialog } from "./SavingsGoalDialog";
 
 export function SavingsGoalsTable() {
   const [editGoal, setEditGoal] = useState<SavingsGoal | null>(null);
-  const { goals, isLoadingGoals, deleteGoal } = useSavings();
+  const queryClient = useQueryClient();
 
-  const handleDeleteGoal = async (goalId: string) => {
+  const { data: goals, isLoading } = useQuery({
+    queryKey: SAVINGS_QUERY_KEYS.state,
+    select: (state) => state.goals,
+  });
+
+  const deleteGoal = async (goalId: string) => {
     try {
-      await deleteGoal.mutateAsync(goalId);
+      await SavingsService.getInstance().deleteGoal(goalId);
+      await queryClient.invalidateQueries({ queryKey: SAVINGS_QUERY_KEYS.state });
       toast.success("Goal deleted successfully");
     } catch (error) {
       console.error("Error deleting goal:", error);
@@ -32,7 +50,7 @@ export function SavingsGoalsTable() {
     }
   };
 
-  if (isLoadingGoals) {
+  if (isLoading) {
     return <div>Loading...</div>;
   }
 
@@ -41,7 +59,6 @@ export function SavingsGoalsTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Name</TableHead>
             <TableHead>Type</TableHead>
             <TableHead>Target Amount</TableHead>
             <TableHead>Period</TableHead>
@@ -53,41 +70,42 @@ export function SavingsGoalsTable() {
         <TableBody>
           {goals?.map((goal) => (
             <TableRow key={goal.id}>
-              <TableCell>{goal.name}</TableCell>
               <TableCell>
                 <Badge variant="outline">
-                  {goal.goal_type === 'one_time' ? 'One Time' : 'Recurring'}
+                  {goal.type === 'one_time' ? 'One Time' :
+                   goal.type === 'recurring_monthly' ? 'Monthly' : 'Yearly'}
                 </Badge>
               </TableCell>
               <TableCell>
-                ${goal.target_amount.toLocaleString()}
-                {goal.recurring_amount && (
+                ${goal.targetAmount.toLocaleString()}
+                {goal.recurringAmount && (
                   <span className="text-sm text-muted-foreground">
-                    {' '}(${goal.recurring_amount.toLocaleString()}/month)
+                    {' '}(${goal.recurringAmount.toLocaleString()}/
+                    {goal.type === 'recurring_monthly' ? 'month' : 'year'})
                   </span>
                 )}
               </TableCell>
               <TableCell>
                 <div className="text-sm">
-                  <div>{format(new Date(goal.period_start), 'MMM d, yyyy')}</div>
-                  {goal.period_end && (
+                  <div>{format(goal.periodStart, 'MMM d, yyyy')}</div>
+                  {goal.periodEnd && (
                     <div className="text-muted-foreground">
-                      to {format(new Date(goal.period_end), 'MMM d, yyyy')}
+                      to {format(goal.periodEnd, 'MMM d, yyyy')}
                     </div>
                   )}
                 </div>
               </TableCell>
               <TableCell>
                 <div className="w-[200px] space-y-1">
-                  <Progress value={goal.progress} className="h-2" />
+                  <Progress value={goal.progress || 0} className="h-2" />
                   <p className="text-xs text-muted-foreground">
-                    {goal.progress.toFixed(1)}% Complete
+                    {goal.progress?.toFixed(1)}% Complete
                   </p>
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant={goal.period_end ? "secondary" : "default"}>
-                  {goal.period_end ? "Completed" : "Active"}
+                <Badge variant={goal.periodEnd ? "secondary" : "default"}>
+                  {goal.periodEnd ? "Completed" : "Active"}
                 </Badge>
               </TableCell>
               <TableCell>
@@ -115,7 +133,7 @@ export function SavingsGoalsTable() {
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => handleDeleteGoal(goal.id)}
+                          onClick={() => deleteGoal(goal.id)}
                         >
                           Delete
                         </AlertDialogAction>
@@ -137,4 +155,4 @@ export function SavingsGoalsTable() {
       />
     </div>
   );
-}
+} 

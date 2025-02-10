@@ -1,81 +1,48 @@
--- Step 1: Add new columns with temporary nullability
-ALTER TABLE public.savings_goals
-ADD COLUMN goal_type text,
-ADD COLUMN recurring_amount numeric,
-ADD COLUMN period_start date,
-ADD COLUMN period_end date;
+-- Drop existing table and related objects
+DROP TABLE IF EXISTS public.savings_goals CASCADE;
 
--- Step 2: Migrate existing data
--- First, ensure all existing goals are properly marked as one-time goals
--- and have their dates properly set
-UPDATE public.savings_goals
-SET 
-  goal_type = 'one_time',
-  period_start = COALESCE(start_date, CURRENT_DATE),
-  period_end = COALESCE(end_date, start_date + INTERVAL '1 year');
-
--- Step 3: Make required columns non-nullable
-ALTER TABLE public.savings_goals
-ALTER COLUMN goal_type SET NOT NULL,
-ALTER COLUMN period_start SET NOT NULL;
-
--- Step 4: Add basic type constraint
-ALTER TABLE public.savings_goals
-ADD CONSTRAINT valid_goal_type 
-CHECK (goal_type IN ('one_time', 'recurring_monthly', 'recurring_yearly'));
-
--- Step 5: Add constraint for recurring amount
-ALTER TABLE public.savings_goals
-ADD CONSTRAINT valid_recurring_amount CHECK (
-  (goal_type IN ('recurring_monthly', 'recurring_yearly') AND recurring_amount IS NOT NULL) OR
-  (goal_type = 'one_time' AND recurring_amount IS NULL)
+-- Create new table with simplified schema
+CREATE TABLE public.savings_goals (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL DEFAULT 'Untitled Goal',
+  goal_type TEXT NOT NULL CHECK (goal_type IN ('one_time', 'recurring')),
+  target_amount NUMERIC NOT NULL CHECK (target_amount > 0),
+  recurring_amount NUMERIC CHECK (
+    (goal_type = 'recurring' AND recurring_amount IS NOT NULL AND recurring_amount > 0) OR
+    (goal_type = 'one_time' AND recurring_amount IS NULL)
+  ),
+  period_start DATE NOT NULL,
+  period_end DATE CHECK (
+    (goal_type = 'one_time' AND period_end IS NOT NULL AND period_end > period_start) OR
+    (goal_type = 'recurring')
+  ),
+  progress NUMERIC NOT NULL DEFAULT 0 CHECK (progress >= 0 AND progress <= 100),
+  notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Step 6: Add constraint for period end
-ALTER TABLE public.savings_goals
-ADD CONSTRAINT valid_period_end CHECK (
-  (goal_type = 'one_time' AND period_end IS NOT NULL) OR
-  (goal_type IN ('recurring_monthly', 'recurring_yearly'))
-);
-
--- Step 7: Create an index for faster queries on active goals
-CREATE INDEX idx_active_savings_goals ON public.savings_goals (user_id, goal_type)
-WHERE period_end IS NULL;
-
--- Step 8: Add trigger to ensure only one active recurring goal per user
-CREATE OR REPLACE FUNCTION check_active_recurring_goals()
+-- Create updated_at trigger
+CREATE OR REPLACE FUNCTION update_savings_goals_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.goal_type IN ('recurring_monthly', 'recurring_yearly') AND NEW.period_end IS NULL THEN
-    IF EXISTS (
-      SELECT 1 FROM public.savings_goals
-      WHERE user_id = NEW.user_id
-        AND goal_type = NEW.goal_type
-        AND period_end IS NULL
-        AND id != COALESCE(NEW.id, '00000000-0000-0000-0000-000000000000'::uuid)
-    ) THEN
-      RAISE EXCEPTION 'User can only have one active recurring goal of each type';
-    END IF;
-  END IF;
+  NEW.updated_at = NOW();
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER enforce_single_active_recurring_goal
-BEFORE INSERT OR UPDATE ON public.savings_goals
-FOR EACH ROW
-EXECUTE FUNCTION check_active_recurring_goals();
+CREATE TRIGGER update_savings_goals_updated_at
+  BEFORE UPDATE ON public.savings_goals
+  FOR EACH ROW
+  EXECUTE FUNCTION update_savings_goals_updated_at();
 
--- Step 9: Drop old columns (after ensuring data is migrated)
-ALTER TABLE public.savings_goals
-DROP COLUMN IF EXISTS start_date,
-DROP COLUMN IF EXISTS end_date;
+-- Create index for faster queries
+CREATE INDEX idx_savings_goals_user_active ON public.savings_goals (user_id, goal_type)
+WHERE period_end IS NULL;
 
--- Step 10: Update RLS policies to reflect new schema
-DROP POLICY IF EXISTS "Users can view their own savings goals" ON public.savings_goals;
-DROP POLICY IF EXISTS "Users can insert their own savings goals" ON public.savings_goals;
-DROP POLICY IF EXISTS "Users can update their own savings goals" ON public.savings_goals;
-DROP POLICY IF EXISTS "Users can delete their own savings goals" ON public.savings_goals;
+-- Add RLS policies
+ALTER TABLE public.savings_goals ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view their own savings goals"
   ON public.savings_goals FOR SELECT
@@ -92,4 +59,28 @@ CREATE POLICY "Users can update their own savings goals"
 
 CREATE POLICY "Users can delete their own savings goals"
   ON public.savings_goals FOR DELETE
-  USING (auth.uid() = user_id); 
+  USING (auth.uid() = user_id);
+
+-- Add trigger to enforce single active recurring goal
+CREATE OR REPLACE FUNCTION check_active_recurring_goals()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.goal_type = 'recurring' AND NEW.period_end IS NULL THEN
+    IF EXISTS (
+      SELECT 1 FROM public.savings_goals
+      WHERE user_id = NEW.user_id
+        AND goal_type = 'recurring'
+        AND period_end IS NULL
+        AND id != COALESCE(NEW.id, '00000000-0000-0000-0000-000000000000'::uuid)
+    ) THEN
+      RAISE EXCEPTION 'User can only have one active recurring goal';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER enforce_single_active_recurring_goal
+  BEFORE INSERT OR UPDATE ON public.savings_goals
+  FOR EACH ROW
+  EXECUTE FUNCTION check_active_recurring_goals(); 
