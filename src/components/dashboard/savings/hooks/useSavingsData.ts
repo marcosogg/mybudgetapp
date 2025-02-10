@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { startOfYear, format, addMonths } from "date-fns";
@@ -43,9 +44,9 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
   // Get current savings goal
   const { data: goalData, error: goalError } = await supabase
     .from("savings_goals")
-    .select("id, user_id, goal_type, target_amount, recurring_amount, period_start, period_end, notes, created_at")
+    .select("id, user_id, name, goal_type, target_amount, recurring_amount, period_start, period_end, notes, created_at")
     .eq("user_id", user.id)
-    .is("end_date", null)
+    .is("period_end", null)
     .maybeSingle();
 
   if (goalError) {
@@ -63,10 +64,11 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
   const currentGoal = goalData ? {
     id: goalData.id,
     user_id: goalData.user_id,
+    name: goalData.name,
     goal_type: goalData.goal_type,
     target_amount: Number(goalData.target_amount),
     recurring_amount: goalData.recurring_amount ? Number(goalData.recurring_amount) : undefined,
-    period_start: new Date(goalData.period_start),
+    period_start: goalData.period_start ? new Date(goalData.period_start) : undefined,
     period_end: goalData.period_end ? new Date(goalData.period_end) : undefined,
     notes: goalData.notes,
     created_at: new Date(goalData.created_at)

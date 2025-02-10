@@ -39,9 +39,10 @@ export function useSavingsGoal() {
 
       const goalData = {
         user_id: user.id,
+        name: values.name,
         goal_type: values.goal_type,
         target_amount: parseFloat(values.target_amount),
-        recurring_amount: values.recurring_amount ? parseFloat(values.recurring_amount) : null,
+        recurring_amount: values.recurring_amount ? parseFloat(values.recurring_amount) : undefined,
         period_start: values.period_start,
         period_end: values.period_end,
         notes: values.notes
@@ -64,6 +65,7 @@ export function useSavingsGoal() {
     mutationFn: async ({ id, values }: { id: string; values: Partial<SavingsGoalFormValues> }) => {
       const updates: any = {};
       
+      if (values.name) updates.name = values.name;
       if (values.goal_type) updates.goal_type = values.goal_type;
       if (values.target_amount) updates.target_amount = parseFloat(values.target_amount);
       if (values.recurring_amount) updates.recurring_amount = parseFloat(values.recurring_amount);
