@@ -121,31 +121,31 @@ export type Database = {
       }
       monthly_income: {
         Row: {
-          id: string
-          user_id: string
-          month: string
-          salary: number
           bonus: number
           created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
+          id: string
           month: string
           salary: number
-          bonus: number
-          created_at?: string
-          updated_at?: string
+          updated_at: string
+          user_id: string
         }
-        Update: {
-          id?: string
-          user_id?: string
-          month?: string
-          salary?: number
+        Insert: {
           bonus?: number
           created_at?: string
+          id?: string
+          month: string
+          salary?: number
           updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bonus?: number
+          created_at?: string
+          id?: string
+          month?: string
+          salary?: number
+          updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -154,7 +154,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       profiles: {
@@ -164,7 +164,9 @@ export type Database = {
           email_notifications_enabled: boolean | null
           id: string
           name: string | null
-          statement_format: Database["public"]["Enums"]["statement_format"] | null
+          statement_format:
+            | Database["public"]["Enums"]["statement_format"]
+            | null
           updated_at: string
         }
         Insert: {
@@ -173,7 +175,9 @@ export type Database = {
           email_notifications_enabled?: boolean | null
           id: string
           name?: string | null
-          statement_format?: Database["public"]["Enums"]["statement_format"] | null
+          statement_format?:
+            | Database["public"]["Enums"]["statement_format"]
+            | null
           updated_at?: string
         }
         Update: {
@@ -182,7 +186,9 @@ export type Database = {
           email_notifications_enabled?: boolean | null
           id?: string
           name?: string | null
-          statement_format?: Database["public"]["Enums"]["statement_format"] | null
+          statement_format?:
+            | Database["public"]["Enums"]["statement_format"]
+            | null
           updated_at?: string
         }
         Relationships: []
@@ -243,45 +249,45 @@ export type Database = {
       }
       savings_goals: {
         Row: {
-          category: string | null
           created_at: string
           goal_type: string
           id: string
+          name: string
           notes: string | null
           period_end: string | null
-          period_start: string
-          priority: number | null
+          period_start: string | null
+          progress: number
           recurring_amount: number | null
-          status: string
           target_amount: number
+          updated_at: string
           user_id: string
         }
         Insert: {
-          category?: string | null
           created_at?: string
           goal_type: string
           id?: string
+          name: string
           notes?: string | null
           period_end?: string | null
-          period_start: string
-          priority?: number | null
+          period_start?: string | null
+          progress?: number
           recurring_amount?: number | null
-          status?: string
           target_amount: number
+          updated_at?: string
           user_id: string
         }
         Update: {
-          category?: string | null
           created_at?: string
           goal_type?: string
           id?: string
+          name?: string
           notes?: string | null
           period_end?: string | null
-          period_start?: string
-          priority?: number | null
+          period_start?: string | null
+          progress?: number
           recurring_amount?: number | null
-          status?: string
           target_amount?: number
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
