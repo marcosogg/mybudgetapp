@@ -22,7 +22,7 @@ export function BudgetSection() {
   const { profile, isLoading: isLoadingProfile } = useProfile();
 
   const totalBudget = budgets?.reduce((sum, budget) => sum + budget.amount, 0) || 0;
-  const monthlyIncome = (profile?.salary || 0) + (profile?.bonus || 0);
+  const monthlyIncome = (profile?.monthlyIncome?.salary || 0) + (profile?.monthlyIncome?.bonus || 0);
   const budgetPercentage = monthlyIncome > 0 ? (totalBudget / monthlyIncome) * 100 : 0;
   const remainingBudget = monthlyIncome - totalBudget;
 

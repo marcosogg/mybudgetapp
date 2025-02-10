@@ -4,16 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Edit2, Save } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
+import { MonthPicker } from "./MonthPicker";
+import { format } from "date-fns";
+import { useMonth } from "@/contexts/MonthContext";
 
 export const IncomeSection = () => {
   const { profile, isLoading, updateIncome } = useProfile();
+  const { selectedMonth } = useMonth();
   const [isEditing, setIsEditing] = useState(false);
   const [salary, setSalary] = useState("");
   const [bonus, setBonus] = useState("");
 
   const handleEdit = () => {
-    setSalary(profile?.salary?.toString() || "");
-    setBonus(profile?.bonus?.toString() || "");
+    setSalary(profile?.monthlyIncome?.salary?.toString() || "");
+    setBonus(profile?.monthlyIncome?.bonus?.toString() || "");
     setIsEditing(true);
   };
 
@@ -42,12 +46,16 @@ export const IncomeSection = () => {
     );
   }
 
-  const totalIncome = (profile?.salary || 0) + (profile?.bonus || 0);
+  const totalIncome = (profile?.monthlyIncome?.salary || 0) + (profile?.monthlyIncome?.bonus || 0);
+  const monthLabel = format(selectedMonth, "MMMM yyyy");
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle>Income</CardTitle>
+        <div className="space-y-1">
+          <CardTitle>Income</CardTitle>
+          <MonthPicker />
+        </div>
         {!isEditing ? (
           <Button
             variant="outline"
@@ -105,11 +113,11 @@ export const IncomeSection = () => {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Monthly Salary:</span>
-                  <span className="font-medium">${profile?.salary?.toLocaleString() || 0}</span>
+                  <span className="font-medium">${profile?.monthlyIncome?.salary?.toLocaleString() || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm text-muted-foreground">Monthly Bonus:</span>
-                  <span className="font-medium">${profile?.bonus?.toLocaleString() || 0}</span>
+                  <span className="font-medium">${profile?.monthlyIncome?.bonus?.toLocaleString() || 0}</span>
                 </div>
                 <div className="flex justify-between pt-4 border-t">
                   <span className="font-medium">Total Monthly Income:</span>

@@ -119,44 +119,70 @@ export type Database = {
           },
         ]
       }
+      monthly_income: {
+        Row: {
+          id: string
+          user_id: string
+          month: string
+          salary: number
+          bonus: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          month: string
+          salary: number
+          bonus: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          month?: string
+          salary?: number
+          bonus?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monthly_income_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       profiles: {
         Row: {
-          bonus: number
           created_at: string
           email: string
           email_notifications_enabled: boolean | null
           id: string
           name: string | null
-          salary: number
-          statement_format:
-            | Database["public"]["Enums"]["statement_format"]
-            | null
+          statement_format: Database["public"]["Enums"]["statement_format"] | null
           updated_at: string
         }
         Insert: {
-          bonus?: number
           created_at?: string
           email: string
           email_notifications_enabled?: boolean | null
           id: string
           name?: string | null
-          salary?: number
-          statement_format?:
-            | Database["public"]["Enums"]["statement_format"]
-            | null
+          statement_format?: Database["public"]["Enums"]["statement_format"] | null
           updated_at?: string
         }
         Update: {
-          bonus?: number
           created_at?: string
           email?: string
           email_notifications_enabled?: boolean | null
           id?: string
           name?: string | null
-          salary?: number
-          statement_format?:
-            | Database["public"]["Enums"]["statement_format"]
-            | null
+          statement_format?: Database["public"]["Enums"]["statement_format"] | null
           updated_at?: string
         }
         Relationships: []
