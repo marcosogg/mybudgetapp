@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import type { SavingsGoal, SavingsProgress } from "@/types/savings";
 import { calculateSavingsProgress } from "./calculations";
@@ -104,14 +105,25 @@ export class SavingsGoalService {
     if (!goal) throw new Error("Goal not found");
 
     // Get savings transactions for the goal period
-    const { data: transactions, error: txError } = await supabase
+    const query = supabase
       .from("transactions")
       .select("date, amount")
       .eq("user_id", user.id)
       .eq("category_id", await this.getSavingsCategoryId(user.id))
-      .gte("date", goal.period_start)
-      .lte("date", goal.period_end || new Date().toISOString())
       .order("date", { ascending: true });
+
+    // Only add date filters if they exist
+    if (goal.period_start) {
+      query.gte("date", goal.period_start);
+    }
+    if (goal.period_end) {
+      query.lte("date", goal.period_end);
+    } else {
+      // If no end date, use current date
+      query.lte("date", new Date().toISOString());
+    }
+
+    const { data: transactions, error: txError } = await query;
 
     if (txError) throw txError;
 
