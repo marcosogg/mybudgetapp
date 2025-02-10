@@ -36,10 +36,8 @@ export default function Settings() {
 
     try {
       await updateIncome.mutateAsync({
-        salary: profile?.salary || 0,
-        bonus: profile?.bonus || 0,
-        statement_format: pendingFormat,
-        name: name,
+        salary: profile?.monthlyIncome?.salary || 0,
+        bonus: profile?.monthlyIncome?.bonus || 0,
       });
       toast.success("Settings updated successfully");
     } catch (error) {
@@ -53,10 +51,8 @@ export default function Settings() {
   const handleUpdateProfile = async () => {
     try {
       await updateIncome.mutateAsync({
-        salary: profile?.salary || 0,
-        bonus: profile?.bonus || 0,
-        statement_format: profile?.statement_format || "revolut",
-        name: name,
+        salary: profile?.monthlyIncome?.salary || 0,
+        bonus: profile?.monthlyIncome?.bonus || 0,
       });
       toast.success("Profile updated successfully");
     } catch (error) {

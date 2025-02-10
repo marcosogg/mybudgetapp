@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -33,7 +34,7 @@ export function BudgetTable({ budgets, onEdit }: BudgetTableProps) {
   const { mutate: deleteBudget, isPending: isDeleting } = useBudgetDelete();
   const [deletingBudget, setDeletingBudget] = useState<Budget | null>(null);
   
-  const monthlyIncome = (profile?.salary || 0) + (profile?.bonus || 0);
+  const monthlyIncome = (profile?.monthlyIncome?.salary || 0) + (profile?.monthlyIncome?.bonus || 0);
 
   const handleDelete = (budget: Budget) => {
     setDeletingBudget(budget);

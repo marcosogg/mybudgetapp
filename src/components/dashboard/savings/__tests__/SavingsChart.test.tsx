@@ -2,16 +2,17 @@
 import { render, screen } from '@testing-library/react';
 import { SavingsChart } from '../SavingsChart';
 import { useSavingsData } from '../hooks/useSavingsData';
-import '@testing-library/jest-dom';
+import { expect, vi, describe, it, beforeEach } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 
 // Mock the custom hook
-jest.mock('../hooks/useSavingsData');
-const mockUseSavingsData = useSavingsData as jest.MockedFunction<typeof useSavingsData>;
+vi.mock('../hooks/useSavingsData');
+const mockUseSavingsData = vi.mocked(useSavingsData);
 
 describe('SavingsChart', () => {
   beforeEach(() => {
     // Clear all mocks before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('renders loading skeleton when data is loading', () => {
