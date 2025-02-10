@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 export function BudgetSection() {
   const [open, setOpen] = useState(false);
   const [selectedBudget, setSelectedBudget] = useState<Budget | undefined>();
-  const { selectedMonth } = useMonth();
+  const { selectedMonth, onMonthChange } = useMonth();
   const { data: budgets, isLoading: isLoadingBudgets, refetch } = useBudgets();
   const { profile, isLoading: isLoadingProfile } = useProfile();
 
@@ -90,7 +90,10 @@ export function BudgetSection() {
       <CardHeader className="flex flex-row items-center justify-between">
         <div className="space-y-2">
           <CardTitle>Budget Allocation</CardTitle>
-          <MonthPicker />
+          <MonthPicker 
+            selectedMonth={selectedMonth}
+            onMonthChange={onMonthChange}
+          />
         </div>
         <div className="flex gap-2">
           <Button onClick={handleCopyPreviousMonth} size="sm" variant="outline">

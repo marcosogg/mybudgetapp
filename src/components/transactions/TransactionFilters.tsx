@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MonthPicker } from "@/components/budget/MonthPicker";
+import { useMonth } from "@/components/budget/useMonth";
 
 interface Category {
   id: string;
@@ -37,6 +38,8 @@ export const TransactionFilters = ({
   setSelectedTags,
   availableTags,
 }: TransactionFiltersProps) => {
+  const { selectedMonth, onMonthChange } = useMonth();
+
   const removeTag = (tag: string) => {
     setSelectedTags(selectedTags.filter((t) => t !== tag));
   };
@@ -51,7 +54,10 @@ export const TransactionFilters = ({
     <div className="space-y-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-center">
         <div className="flex gap-4 items-center">
-          <MonthPicker />
+          <MonthPicker
+            selectedMonth={selectedMonth}
+            onMonthChange={onMonthChange}
+          />
           <Input
             placeholder="Search transactions..."
             value={searchTerm}

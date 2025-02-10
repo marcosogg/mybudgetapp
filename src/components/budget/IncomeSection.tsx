@@ -10,7 +10,7 @@ import { useMonth } from "@/contexts/MonthContext";
 
 export const IncomeSection = () => {
   const { profile, isLoading, updateIncome } = useProfile();
-  const { selectedMonth } = useMonth();
+  const { selectedMonth, onMonthChange } = useMonth();
   const [isEditing, setIsEditing] = useState(false);
   const [salary, setSalary] = useState("");
   const [bonus, setBonus] = useState("");
@@ -54,7 +54,10 @@ export const IncomeSection = () => {
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="space-y-1">
           <CardTitle>Income</CardTitle>
-          <MonthPicker />
+          <MonthPicker
+            selectedMonth={selectedMonth}
+            onMonthChange={onMonthChange}
+          />
         </div>
         {!isEditing ? (
           <Button

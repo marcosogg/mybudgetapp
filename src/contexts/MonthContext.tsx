@@ -1,8 +1,9 @@
+
 import { createContext, useContext, useState, ReactNode } from "react";
 
 interface MonthContextType {
   selectedMonth: Date;
-  setSelectedMonth: (date: Date) => void;
+  onMonthChange: (date: Date) => void;
 }
 
 const MonthContext = createContext<MonthContextType | undefined>(undefined);
@@ -13,8 +14,12 @@ export function MonthProvider({ children }: { children: ReactNode }) {
     return new Date(today.getFullYear(), today.getMonth(), 1);
   });
 
+  const onMonthChange = (date: Date) => {
+    setSelectedMonth(date);
+  };
+
   return (
-    <MonthContext.Provider value={{ selectedMonth, setSelectedMonth }}>
+    <MonthContext.Provider value={{ selectedMonth, onMonthChange }}>
       {children}
     </MonthContext.Provider>
   );
