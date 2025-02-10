@@ -1,8 +1,18 @@
 import { SAVINGS_CONSTANTS } from "../constants/savings";
 import type { TrendIndicator } from "../constants/savings";
-import type { MonthlySavingsData, SavingsMetrics, SavingsProjection } from "../types/savings";
-import { differenceInMonths, differenceInYears, startOfMonth, endOfMonth } from "date-fns";
-import type { SavingsGoal } from "../types/savings";
+import type { MonthlySavingsData, SavingsMetrics, SavingsProjection, SavingsGoal } from "../types/savings";
+import { 
+  differenceInMonths, 
+  differenceInYears, 
+  startOfMonth, 
+  endOfMonth,
+  startOfYear,
+  endOfYear,
+  isAfter,
+  isBefore,
+  isSameMonth,
+  isSameYear
+} from "date-fns";
 
 export function calculateTrendIndicator(current: number, previous: number): TrendIndicator {
   const difference = current - previous;
@@ -13,7 +23,17 @@ export function calculateTrendIndicator(current: number, previous: number): Tren
 }
 
 export function calculateSavingsMetrics(goals: SavingsGoal[]): SavingsMetrics {
-  const activeGoals = goals.filter(goal => !goal.period_end || new Date(goal.period_end) > new Date());
+  const activeGoals = goals.filter(goal => {
+    if (goal.goal_type === 'one_time') return true;
+    const now = new Date();
+    if (goal.goal_type === 'recurring_monthly') {
+      return isSameMonth(goal.period_start!, now) || isAfter(goal.period_start!, now);
+    }
+    if (goal.goal_type === 'recurring_yearly') {
+      return isSameYear(goal.period_start!, now) || isAfter(goal.period_start!, now);
+    }
+    return false;
+  });
   
   const yearTotal = calculateYearTotal(activeGoals);
   const averageMonthlySavings = calculateAverageMonthlySavings(activeGoals);
@@ -33,30 +53,35 @@ export function calculateSavingsMetrics(goals: SavingsGoal[]): SavingsMetrics {
 }
 
 function calculateYearTotal(goals: SavingsGoal[]): number {
+  const now = new Date();
+  
   return goals.reduce((total, goal) => {
-    if (goal.goal_type === 'one_time') {
-      const yearsSpan = differenceInYears(
-        new Date(goal.period_end || new Date()),
-        new Date(goal.period_start)
-      );
-      return total + (goal.target_amount / Math.max(1, yearsSpan));
+    switch (goal.goal_type) {
+      case 'one_time':
+        return total + goal.target_amount;
+      case 'recurring_monthly':
+        const monthsRemaining = 12 - now.getMonth();
+        return total + ((goal.recurring_amount || 0) * monthsRemaining);
+      case 'recurring_yearly':
+        return total + (goal.recurring_amount || 0);
+      default:
+        return total;
     }
-    
-    return total + ((goal.recurring_amount || 0) * 12);
   }, 0);
 }
 
 function calculateAverageMonthlySavings(goals: SavingsGoal[]): number {
   return goals.reduce((total, goal) => {
-    if (goal.goal_type === 'one_time') {
-      const monthsSpan = differenceInMonths(
-        new Date(goal.period_end || new Date()),
-        new Date(goal.period_start)
-      );
-      return total + (goal.target_amount / Math.max(1, monthsSpan));
+    switch (goal.goal_type) {
+      case 'one_time':
+        return total + (goal.target_amount / 12); // Spread over a year
+      case 'recurring_monthly':
+        return total + (goal.recurring_amount || 0);
+      case 'recurring_yearly':
+        return total + ((goal.recurring_amount || 0) / 12);
+      default:
+        return total;
     }
-    
-    return total + (goal.recurring_amount || 0);
   }, 0);
 }
 
@@ -65,20 +90,28 @@ function calculateAmounts(goals: SavingsGoal[]): { currentAmount: number; expect
   
   return goals.reduce(
     (acc, goal) => {
-      const start = new Date(goal.period_start);
-      const end = goal.period_end ? new Date(goal.period_end) : now;
-      const totalMonths = differenceInMonths(end, start) || 1;
-      const elapsedMonths = differenceInMonths(now, start) || 1;
-      
-      if (goal.goal_type === 'one_time') {
-        const expectedProgress = elapsedMonths / totalMonths;
-        acc.expectedAmount += goal.target_amount * expectedProgress;
-        acc.currentAmount += goal.target_amount * (goal.progress / 100);
-      } else {
-        acc.expectedAmount += (goal.recurring_amount || 0) * elapsedMonths;
-        acc.currentAmount += (goal.recurring_amount || 0) * elapsedMonths * (goal.progress / 100);
+      switch (goal.goal_type) {
+        case 'one_time':
+          acc.expectedAmount += goal.target_amount;
+          acc.currentAmount += goal.target_amount * (goal.progress / 100);
+          break;
+        case 'recurring_monthly':
+          if (goal.period_start) {
+            const monthsSinceStart = differenceInMonths(now, goal.period_start);
+            const expectedMonths = Math.max(0, monthsSinceStart + 1);
+            acc.expectedAmount += (goal.recurring_amount || 0) * expectedMonths;
+            acc.currentAmount += (goal.recurring_amount || 0) * expectedMonths * (goal.progress / 100);
+          }
+          break;
+        case 'recurring_yearly':
+          if (goal.period_start) {
+            const yearsSinceStart = differenceInYears(now, goal.period_start);
+            const expectedYears = Math.max(0, yearsSinceStart + 1);
+            acc.expectedAmount += (goal.recurring_amount || 0) * expectedYears;
+            acc.currentAmount += (goal.recurring_amount || 0) * expectedYears * (goal.progress / 100);
+          }
+          break;
       }
-      
       return acc;
     },
     { currentAmount: 0, expectedAmount: 0 }
@@ -88,26 +121,59 @@ function calculateAmounts(goals: SavingsGoal[]): { currentAmount: number; expect
 function calculateOverallProgress(goals: SavingsGoal[]): number {
   if (!goals.length) return 0;
   
-  const totalWeight = goals.reduce((sum, goal) => sum + goal.target_amount, 0);
+  const totalWeight = goals.reduce((sum, goal) => {
+    switch (goal.goal_type) {
+      case 'one_time':
+        return sum + goal.target_amount;
+      case 'recurring_monthly':
+      case 'recurring_yearly':
+        return sum + (goal.recurring_amount || 0);
+    }
+  }, 0);
+
+  if (totalWeight === 0) return 0;
+  
   const weightedProgress = goals.reduce((sum, goal) => {
-    const weight = goal.target_amount / totalWeight;
-    return sum + goal.progress * weight;
+    let weight;
+    switch (goal.goal_type) {
+      case 'one_time':
+        weight = goal.target_amount / totalWeight;
+        break;
+      case 'recurring_monthly':
+      case 'recurring_yearly':
+        weight = (goal.recurring_amount || 0) / totalWeight;
+        break;
+      default:
+        weight = 0;
+    }
+    return sum + (goal.progress * weight);
   }, 0);
   
   return weightedProgress;
 }
 
 function calculateProjectedEndAmount(goals: SavingsGoal[]): number {
+  const now = new Date();
+  
   return goals.reduce((total, goal) => {
-    if (goal.goal_type === 'one_time') {
-      return total + goal.target_amount;
+    switch (goal.goal_type) {
+      case 'one_time':
+        return total + goal.target_amount;
+      case 'recurring_monthly':
+        if (goal.period_start) {
+          const monthsRemaining = 12 - differenceInMonths(now, goal.period_start);
+          return total + ((goal.recurring_amount || 0) * monthsRemaining);
+        }
+        return total;
+      case 'recurring_yearly':
+        if (goal.period_start) {
+          const yearsRemaining = 1 - differenceInYears(now, goal.period_start);
+          return total + ((goal.recurring_amount || 0) * yearsRemaining);
+        }
+        return total;
+      default:
+        return total;
     }
-    
-    const end = goal.period_end ? new Date(goal.period_end) : new Date();
-    const start = new Date(goal.period_start);
-    const months = differenceInMonths(end, start) || 1;
-    
-    return total + ((goal.recurring_amount || 0) * months);
   }, 0);
 }
 

@@ -7,6 +7,7 @@ import type {
   SavingsGoalFormValues
 } from "../types/savings";
 import { calculateSavingsMetrics, calculateProjections } from "../utils/calculations";
+import { startOfMonth, startOfYear } from "date-fns";
 
 export class SavingsService {
   private static instance: SavingsService;
@@ -91,15 +92,26 @@ export class SavingsService {
     const { data: { user } } = await supabaseClient.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
+    // Handle dates based on goal type
+    let periodStart = null;
+    let periodEnd = null;
+
+    if (values.goal_type === 'recurring_monthly' && values.period_start) {
+      periodStart = startOfMonth(values.period_start).toISOString();
+    } else if (values.goal_type === 'recurring_yearly') {
+      periodStart = startOfYear(new Date()).toISOString();
+    }
+
     const { data, error } = await supabaseClient
       .from('savings_goals')
       .insert({
         user_id: user.id,
-        goal_type: values.type,
-        target_amount: parseFloat(values.targetAmount),
-        recurring_amount: values.recurringAmount ? parseFloat(values.recurringAmount) : null,
-        period_start: values.periodStart.toISOString(),
-        period_end: values.periodEnd?.toISOString() || null,
+        goal_type: values.goal_type,
+        name: values.name,
+        target_amount: values.target_amount,
+        recurring_amount: values.recurring_amount || null,
+        period_start: periodStart,
+        period_end: periodEnd,
         notes: values.notes
       })
       .select()
@@ -110,14 +122,25 @@ export class SavingsService {
   }
 
   async updateGoal(goalId: string, values: SavingsGoalFormValues): Promise<SavingsGoal> {
+    // Handle dates based on goal type
+    let periodStart = null;
+    let periodEnd = null;
+
+    if (values.goal_type === 'recurring_monthly' && values.period_start) {
+      periodStart = startOfMonth(values.period_start).toISOString();
+    } else if (values.goal_type === 'recurring_yearly') {
+      periodStart = startOfYear(new Date()).toISOString();
+    }
+
     const { data, error } = await supabaseClient
       .from('savings_goals')
       .update({
-        goal_type: values.type,
-        target_amount: parseFloat(values.targetAmount),
-        recurring_amount: values.recurringAmount ? parseFloat(values.recurringAmount) : null,
-        period_start: values.periodStart.toISOString(),
-        period_end: values.periodEnd?.toISOString() || null,
+        goal_type: values.goal_type,
+        name: values.name,
+        target_amount: values.target_amount,
+        recurring_amount: values.recurring_amount || null,
+        period_start: periodStart,
+        period_end: periodEnd,
         notes: values.notes
       })
       .eq('id', goalId)
@@ -153,16 +176,11 @@ export class SavingsService {
 
   private transformGoalData(data: any): SavingsGoal {
     return {
-      id: data.id,
-      userId: data.user_id,
-      type: data.goal_type,
-      targetAmount: data.target_amount,
-      recurringAmount: data.recurring_amount,
-      periodStart: new Date(data.period_start),
-      periodEnd: data.period_end ? new Date(data.period_end) : undefined,
-      notes: data.notes,
-      createdAt: new Date(data.created_at),
-      progress: data.progress
+      ...data,
+      period_start: data.period_start ? new Date(data.period_start) : null,
+      period_end: data.period_end ? new Date(data.period_end) : null,
+      created_at: new Date(data.created_at),
+      updated_at: new Date(data.updated_at),
     };
   }
 

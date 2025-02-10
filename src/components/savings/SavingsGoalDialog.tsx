@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -38,21 +37,28 @@ export function SavingsGoalDialog({
       goal_type: goal?.goal_type || 'one_time',
       target_amount: goal?.target_amount?.toString() || "",
       recurring_amount: goal?.recurring_amount?.toString() || "",
-      period_start: goal?.period_start || new Date(),
-      period_end: goal?.period_end,
+      period_start: goal?.period_start || undefined,
+      period_end: goal?.period_end || undefined,
       notes: goal?.notes || "",
     }
   });
 
   const handleSubmit = async (values: SavingsGoalFormValues) => {
     try {
+      // Prepare the values based on goal type
+      const preparedValues = {
+        ...values,
+        period_start: values.goal_type === 'recurring_monthly' ? values.period_start : undefined,
+        period_end: undefined // We don't use period_end anymore
+      };
+
       if (mode === 'edit' && goal) {
         await updateGoal.mutateAsync({
           id: goal.id,
-          values
+          values: preparedValues
         });
       } else {
-        await createGoal.mutateAsync(values);
+        await createGoal.mutateAsync(preparedValues);
       }
       onOpenChange(false);
       form.reset();
