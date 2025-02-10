@@ -2,6 +2,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSavingsGoal } from "@/hooks/useSavingsGoal";
 import type { SavingsGoal, SavingsGoalType } from "@/types/savings";
@@ -35,6 +36,7 @@ export function SavingsGoalDialog({
   const form = useForm<SavingsGoalFormValues>({
     resolver: zodResolver(savingsGoalSchema),
     defaultValues: {
+      name: goal?.name || "",
       goal_type: goal?.goal_type || 'one_time',
       target_amount: goal?.target_amount?.toString() || "",
       recurring_amount: goal?.recurring_amount?.toString() || "",
@@ -80,6 +82,19 @@ export function SavingsGoalDialog({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Goal Name</Label>
+            <Input
+              {...form.register("name")}
+              placeholder="Enter goal name"
+            />
+            {form.formState.errors.name && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.name.message}
+              </p>
+            )}
+          </div>
+
           <GoalTypeSelect
             value={selectedType}
             onChange={(value) => {

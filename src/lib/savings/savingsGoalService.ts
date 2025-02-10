@@ -22,10 +22,11 @@ export class SavingsGoalService {
       .from("savings_goals")
       .insert({
         user_id: user.id,
+        name: goal.name,
         goal_type: goal.goal_type,
         target_amount: goal.target_amount,
         recurring_amount: goal.recurring_amount,
-        period_start: format(goal.period_start, 'yyyy-MM-dd'),
+        period_start: goal.period_start ? format(goal.period_start, 'yyyy-MM-dd') : null,
         period_end: goal.period_end ? format(goal.period_end, 'yyyy-MM-dd') : null,
         notes: goal.notes
       })
@@ -138,10 +139,11 @@ export class SavingsGoalService {
     return {
       id: data.id,
       user_id: data.user_id,
+      name: data.name,
       goal_type: data.goal_type,
       target_amount: Number(data.target_amount),
       recurring_amount: data.recurring_amount ? Number(data.recurring_amount) : undefined,
-      period_start: new Date(data.period_start),
+      period_start: data.period_start ? new Date(data.period_start) : undefined,
       period_end: data.period_end ? new Date(data.period_end) : undefined,
       notes: data.notes,
       created_at: new Date(data.created_at)
@@ -176,4 +178,4 @@ export class SavingsGoalService {
     if (createError) throw createError;
     return newCategory.id;
   }
-} 
+}

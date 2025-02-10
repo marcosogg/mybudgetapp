@@ -1,3 +1,4 @@
+
 import { z } from "zod";
 
 // Basic type definitions
@@ -6,6 +7,7 @@ export type SavingsGoalType = 'one_time' | 'recurring_monthly' | 'recurring_year
 export interface SavingsGoal {
   id: string;
   user_id: string;
+  name: string;
   goal_type: SavingsGoalType;
   target_amount: number;
   recurring_amount?: number;
@@ -50,6 +52,7 @@ export interface SavingsChartData {
 
 // Form-related types
 export interface SavingsGoalFormData {
+  name: string;
   goal_type: SavingsGoalType;
   target_amount: string;
   recurring_amount?: string;
@@ -60,6 +63,7 @@ export interface SavingsGoalFormData {
 
 // Validation schemas
 export const savingsGoalSchema = z.object({
+  name: z.string().min(1, "Name is required"),
   goal_type: z.enum(['one_time', 'recurring_monthly', 'recurring_yearly']),
   target_amount: z.string()
     .min(1, "Target amount is required")
