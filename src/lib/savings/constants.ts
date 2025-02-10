@@ -1,6 +1,6 @@
+
 export const SAVINGS_CONSTANTS = {
   GOAL_TYPES: {
-    ONE_TIME: 'one_time' as const,
     RECURRING_MONTHLY: 'recurring_monthly' as const,
     RECURRING_YEARLY: 'recurring_yearly' as const,
   },
@@ -30,13 +30,11 @@ export const SAVINGS_CONSTANTS = {
 } as const;
 
 export const GOAL_TYPE_LABELS = {
-  [SAVINGS_CONSTANTS.GOAL_TYPES.ONE_TIME]: 'One-time Goal',
   [SAVINGS_CONSTANTS.GOAL_TYPES.RECURRING_MONTHLY]: 'Monthly Goal',
   [SAVINGS_CONSTANTS.GOAL_TYPES.RECURRING_YEARLY]: 'Yearly Goal',
 } as const;
 
 export const GOAL_TYPE_DESCRIPTIONS = {
-  [SAVINGS_CONSTANTS.GOAL_TYPES.ONE_TIME]: 'Set a target amount to save by a specific date',
   [SAVINGS_CONSTANTS.GOAL_TYPES.RECURRING_MONTHLY]: 'Set a monthly savings target',
   [SAVINGS_CONSTANTS.GOAL_TYPES.RECURRING_YEARLY]: 'Set a yearly savings target',
-} as const; 
+} as const;
