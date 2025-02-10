@@ -3,9 +3,8 @@ import { toast } from "sonner";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronRight, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import {
   AlertDialog,
@@ -17,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 export default function Settings() {
@@ -64,14 +64,9 @@ export default function Settings() {
     }
   };
 
-  const handleCancelFormatChange = () => {
-    setShowFormatDialog(false);
-    setPendingFormat(null);
-  };
-
   return (
-    <div className="container max-w-2xl py-8 space-y-8">
-      <div className="flex items-center gap-4">
+    <div className="container max-w-2xl py-8">
+      <div className="flex items-center gap-4 mb-8">
         <Button
           variant="ghost"
           size="icon"
@@ -83,51 +78,89 @@ export default function Settings() {
         <h1 className="text-2xl font-semibold">Settings</h1>
       </div>
 
-      <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-4">Profile</h2>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-            />
+      <div className="space-y-6">
+        {/* Profile Section */}
+        <div>
+          <h2 className="text-base font-semibold mb-4">Profile</h2>
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <div className="font-medium">{name}</div>
+              <div className="text-sm text-muted-foreground">Your display name</div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={handleUpdateProfile}>
+              <Pencil className="h-4 w-4" />
+            </Button>
           </div>
-          <Button onClick={handleUpdateProfile}>
-            Update Profile
-          </Button>
+          <div className="h-px bg-border mt-6" />
         </div>
-      </Card>
 
-      <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-4">Statement Format</h2>
-        <RadioGroup
-          defaultValue={profile?.statement_format || "revolut"}
-          onValueChange={handleFormatChange}
-          className="grid gap-4"
-        >
-          <div className="flex items-center space-x-4 rounded-lg border p-4">
-            <RadioGroupItem value="revolut" id="revolut" />
-            <Label htmlFor="revolut" className="flex-1">
-              <div className="font-semibold mb-1">Revolut</div>
+        {/* Categories Section */}
+        <div>
+          <h2 className="text-base font-semibold mb-4">Categories</h2>
+          <Button
+            variant="ghost"
+            className="w-full flex items-center justify-between py-2 px-0 h-auto hover:bg-transparent"
+            onClick={() => navigate("/categories")}
+          >
+            <div className="text-left">
+              <div className="font-medium">Manage categories</div>
               <div className="text-sm text-muted-foreground">
-                Format: Date, Description, Amount
+                Manage your transaction categories and budgeting rules
               </div>
-            </Label>
-          </div>
-          <div className="flex items-center space-x-4 rounded-lg border p-4">
-            <RadioGroupItem value="wise" id="wise" />
-            <Label htmlFor="wise" className="flex-1">
-              <div className="font-semibold mb-1">Wise</div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Button>
+          <div className="h-px bg-border mt-6" />
+        </div>
+
+        {/* Reminders Section */}
+        <div>
+          <h2 className="text-base font-semibold mb-4">Reminders</h2>
+          <Button
+            variant="ghost"
+            className="w-full flex items-center justify-between py-2 px-0 h-auto hover:bg-transparent"
+            onClick={() => navigate("/reminders")}
+          >
+            <div className="text-left">
+              <div className="font-medium">Configure reminders</div>
               <div className="text-sm text-muted-foreground">
-                Format: Date, Amount, Description
+                Set up and manage your financial reminders and notifications
               </div>
-            </Label>
-          </div>
-        </RadioGroup>
-      </Card>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </Button>
+          <div className="h-px bg-border mt-6" />
+        </div>
+
+        {/* Statement Format Section */}
+        <div>
+          <h2 className="text-base font-semibold mb-4">Statement Format</h2>
+          <RadioGroup
+            defaultValue={profile?.statement_format || "revolut"}
+            onValueChange={handleFormatChange}
+            className="space-y-4"
+          >
+            <div className="flex items-start space-x-4">
+              <RadioGroupItem value="revolut" id="revolut" className="mt-1" />
+              <Label htmlFor="revolut" className="flex-1 cursor-pointer">
+                <div className="font-medium">Revolut</div>
+                <div className="text-sm text-muted-foreground">
+                  Format: Date, Description, Amount
+                </div>
+              </Label>
+            </div>
+            <div className="flex items-start space-x-4">
+              <RadioGroupItem value="wise" id="wise" className="mt-1" />
+              <Label htmlFor="wise" className="flex-1 cursor-pointer">
+                <div className="font-medium">Wise</div>
+                <div className="text-sm text-muted-foreground">
+                  Format: Date, Amount, Description
+                </div>
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+      </div>
 
       <AlertDialog open={showFormatDialog} onOpenChange={setShowFormatDialog}>
         <AlertDialogContent>
@@ -139,7 +172,7 @@ export default function Settings() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancelFormatChange}>
+            <AlertDialogCancel onClick={() => setShowFormatDialog(false)}>
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmFormatChange}>

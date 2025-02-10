@@ -8,6 +8,7 @@ import { useTransactions } from "@/components/transactions/hooks/useTransactions
 import { useCategories } from "@/components/transactions/hooks/useCategories";
 import { filterTransactions, sortTransactions, formatCurrency } from "@/components/transactions/utils/transactionUtils";
 import { SortField, SortOrder } from "@/components/transactions/types";
+import { useMonth } from "@/contexts/MonthContext";
 
 const Transactions = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,8 +16,11 @@ const Transactions = () => {
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const { selectedMonth } = useMonth();
 
-  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions();
+  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions({
+    selectedMonth,
+  });
   const { data: categories = [] } = useCategories();
 
   const availableTags = useMemo(() => {
@@ -47,7 +51,24 @@ const Transactions = () => {
   };
 
   if (isLoadingTransactions) {
-    return <div>Loading...</div>;
+    return (
+      <div className="space-y-6">
+        <TransactionHeader />
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Transactions</CardTitle>
+            <div className="h-10 w-full animate-pulse bg-muted rounded-md" />
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="h-16 w-full animate-pulse bg-muted rounded-md" />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (

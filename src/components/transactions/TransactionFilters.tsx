@@ -9,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MonthPicker } from "@/components/budget/MonthPicker";
 
 interface Category {
   id: string;
@@ -49,12 +50,15 @@ export const TransactionFilters = ({
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <Input
-          placeholder="Search transactions..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="max-w-sm"
-        />
+        <div className="flex gap-4 items-center">
+          <MonthPicker />
+          <Input
+            placeholder="Search transactions..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-sm"
+          />
+        </div>
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by category" />
@@ -62,11 +66,13 @@ export const TransactionFilters = ({
           <SelectContent>
             <SelectItem value="all">All Categories</SelectItem>
             <SelectItem value="uncategorized">Uncategorized</SelectItem>
-            {categories.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                {category.name}
-              </SelectItem>
-            ))}
+            {categories
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </div>
