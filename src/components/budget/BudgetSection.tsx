@@ -88,9 +88,8 @@ export function BudgetSection() {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <div className="space-y-2">
+        <div>
           <CardTitle>Budget Allocation</CardTitle>
-          <MonthPicker />
         </div>
         <div className="flex gap-2">
           <Button onClick={handleCopyPreviousMonth} size="sm" variant="outline">
