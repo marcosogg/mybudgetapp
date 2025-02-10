@@ -1,9 +1,5 @@
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useSavingsGoal } from "@/hooks/useSavingsGoal";
 import type { SavingsGoal, SavingsGoalType } from "@/types/savings";
 import { useForm } from "react-hook-form";
@@ -14,6 +10,9 @@ import { useState } from "react";
 import { GoalTypeSelect } from "./form/GoalTypeSelect";
 import { GoalAmountInput } from "./form/GoalAmountInput";
 import { GoalDateFields } from "./form/GoalDateFields";
+import { GoalNameField } from "./form/GoalNameField";
+import { GoalNotesField } from "./form/GoalNotesField";
+import { GoalFormActions } from "./form/GoalFormActions";
 
 interface SavingsGoalDialogProps {
   open: boolean;
@@ -82,18 +81,10 @@ export function SavingsGoalDialog({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Goal Name</Label>
-            <Input
-              {...form.register("name")}
-              placeholder="Enter goal name"
-            />
-            {form.formState.errors.name && (
-              <p className="text-sm text-destructive">
-                {form.formState.errors.name.message}
-              </p>
-            )}
-          </div>
+          <GoalNameField 
+            register={form.register}
+            errors={form.formState.errors}
+          />
 
           <GoalTypeSelect
             value={selectedType}
@@ -117,36 +108,15 @@ export function SavingsGoalDialog({
             errors={form.formState.errors}
           />
 
-          <div className="space-y-2">
-            <Label htmlFor="notes">Notes (Optional)</Label>
-            <Textarea
-              {...form.register("notes")}
-              placeholder="Add notes about your goal"
-            />
-          </div>
+          <GoalNotesField register={form.register} />
 
-          <div className="flex gap-2 justify-end">
-            {mode === 'edit' && !goal?.period_end && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleEndGoal}
-                disabled={endCurrentGoal.isPending}
-              >
-                End Goal
-              </Button>
-            )}
-            <Button
-              type="submit"
-              disabled={createGoal.isPending || updateGoal.isPending}
-            >
-              {createGoal.isPending || updateGoal.isPending
-                ? "Saving..."
-                : mode === 'edit'
-                ? "Update Goal"
-                : "Create Goal"}
-            </Button>
-          </div>
+          <GoalFormActions 
+            mode={mode}
+            goal={goal}
+            onEndGoal={handleEndGoal}
+            isSubmitting={createGoal.isPending || updateGoal.isPending}
+            isEndingGoal={endCurrentGoal.isPending}
+          />
         </form>
       </DialogContent>
     </Dialog>
