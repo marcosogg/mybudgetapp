@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Edit2, Save } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
+import { MonthPicker } from "./MonthPicker";
+import { format } from "date-fns";
 import { useMonth } from "@/contexts/MonthContext";
 
 export const IncomeSection = () => {
@@ -45,12 +47,14 @@ export const IncomeSection = () => {
   }
 
   const totalIncome = (profile?.monthlyIncome?.salary || 0) + (profile?.monthlyIncome?.bonus || 0);
+  const monthLabel = format(selectedMonth, "MMMM yyyy");
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <div>
+        <div className="space-y-1">
           <CardTitle>Income</CardTitle>
+          <MonthPicker />
         </div>
         {!isEditing ? (
           <Button

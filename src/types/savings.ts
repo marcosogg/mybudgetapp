@@ -67,33 +67,19 @@ export const savingsGoalSchema = z.object({
   recurring_amount: z.string()
     .optional()
     .refine(val => !val || (!isNaN(parseFloat(val)) && parseFloat(val) > 0), "Must be a positive number if provided"),
-  period_start: z.date().optional(),
+  period_start: z.date(),
   period_end: z.date().optional(),
   notes: z.string().optional(),
 }).refine(data => {
-  // Recurring amount is required for recurring goals
+  if (data.goal_type === 'one_time' && !data.period_end) {
+    return false;
+  }
   if (['recurring_monthly', 'recurring_yearly'].includes(data.goal_type) && !data.recurring_amount) {
     return false;
   }
-  
-  // Period start is only required for monthly goals
-  if (data.goal_type === 'recurring_monthly' && !data.period_start) {
-    return false;
-  }
-
-  // One-time goals don't need any dates
-  if (data.goal_type === 'one_time' && (data.period_start || data.period_end)) {
-    return false;
-  }
-
-  // Yearly goals don't need any dates (uses current year)
-  if (data.goal_type === 'recurring_yearly' && (data.period_start || data.period_end)) {
-    return false;
-  }
-
   return true;
 }, {
-  message: "Please check the goal type requirements"
+  message: "End date is required for one-time goals, and recurring amount is required for recurring goals"
 });
 
 export type SavingsGoalFormValues = z.infer<typeof savingsGoalSchema>; 
