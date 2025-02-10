@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -10,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tag, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MonthPicker } from "@/components/budget/MonthPicker";
-import { useMonth } from "@/components/budget/useMonth";
+import { useMonth } from "@/contexts/MonthContext";
 
 interface Category {
   id: string;
