@@ -44,7 +44,7 @@ export function MonthPicker({ selectedMonth, onMonthChange, className }: MonthPi
         <Button
           variant="outline"
           className={cn(
-            "w-full justify-start text-left font-normal h-11",
+            "h-9 px-3 text-sm", // Reduced height and padding, smaller text
             className
           )}
         >
@@ -57,10 +57,10 @@ export function MonthPicker({ selectedMonth, onMonthChange, className }: MonthPi
           <Button
             variant="outline"
             size="icon"
-            className="h-9 w-9"
+            className="h-8 w-8" // Slightly smaller buttons in the popover
             onClick={handlePreviousMonth}
           >
-            <ChevronLeft className="h-5 w-5" />
+            <ChevronLeft className="h-4 w-4" />
           </Button>
           <div className="text-center font-medium min-w-[120px]">
             {formattedDate}
@@ -68,13 +68,14 @@ export function MonthPicker({ selectedMonth, onMonthChange, className }: MonthPi
           <Button
             variant="outline"
             size="icon"
-            className="h-9 w-9"
+            className="h-8 w-8" // Slightly smaller buttons in the popover
             onClick={handleNextMonth}
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
       </PopoverContent>
     </Popover>
   );
 }
+
