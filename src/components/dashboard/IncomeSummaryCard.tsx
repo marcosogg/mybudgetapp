@@ -14,7 +14,7 @@ export function IncomeSummaryCard() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Monthly Income</CardTitle>
+          <CardTitle className="text-xl font-semibold tracking-tight">Monthly Income</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -43,7 +43,7 @@ export function IncomeSummaryCard() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Monthly Income</CardTitle>
+          <CardTitle className="text-xl font-semibold tracking-tight">Monthly Income</CardTitle>
         </CardHeader>
         <CardContent>
           <Alert variant="destructive">
@@ -60,7 +60,7 @@ export function IncomeSummaryCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Monthly Income - {format(selectedMonth, 'MMMM yyyy')}</CardTitle>
+        <CardTitle className="text-xl font-semibold tracking-tight">Monthly Income - {format(selectedMonth, 'MMMM yyyy')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

@@ -1,4 +1,3 @@
-
 # Changelog
 
 ## [Unreleased]
@@ -40,6 +39,16 @@
 - Added detailed logging for debugging purposes
 - Updated import UI with clear format indicators
 - Enhanced import flow with confirmation dialogs
+- Standardized card title styling across all dashboard components
+  - Unified font size to text-xl
+  - Consistent font weight using font-semibold
+  - Added tracking-tight for improved readability
+  - Standardized spacing in CardHeader components
+- Updated title styling for:
+  - Monthly Budget card
+  - Monthly Income card
+  - Transactions card
+  - Upcoming Reminders section
 
 ### Technical Details
 - Added wiseTransformer.ts for handling Wise-specific transformations
@@ -51,4 +60,3 @@
 - Added comprehensive error handling for date parsing
 - Implemented defensive programming for date handling
 - Added support for multiple date format detection
-

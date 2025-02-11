@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface TransactionSummaryCardProps {
@@ -11,7 +12,7 @@ export function TransactionSummaryCard({ count, total }: TransactionSummaryCardP
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Transactions</CardTitle>
+        <CardTitle className="text-xl font-semibold tracking-tight">Transactions</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">

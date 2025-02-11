@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useReminders } from "@/hooks/reminders/useReminders";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ export function UpcomingReminders() {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Upcoming Reminders</CardTitle>
+        <CardTitle className="text-xl font-semibold tracking-tight">Upcoming Reminders</CardTitle>
         <Button size="sm" onClick={() => navigate("/reminders")}>
           <Plus className="mr-2 h-4 w-4" />
           Add Reminder

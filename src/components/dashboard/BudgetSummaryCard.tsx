@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useBudgetComparison } from "@/hooks/budget/useBudgetComparison";
 import { useMonth } from "@/contexts/MonthContext";
@@ -17,7 +18,7 @@ export function BudgetSummaryCard() {
   return (
     <Card className="shadow-md">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">Monthly Budget</CardTitle>
+        <CardTitle className="text-xl font-semibold tracking-tight">Monthly Budget</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
