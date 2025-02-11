@@ -3,7 +3,7 @@ import { TrendingUp, TrendingDown } from "lucide-react";
 import { BudgetComparisonChart } from "./BudgetComparisonChart";
 import { useAIInsights } from "@/hooks/useAIInsights";
 import { cn } from "@/lib/utils";
-import { SavingsChart } from "./SavingsChart";
+import { SavingsChart } from "./savings/SavingsChart";
 import { QuickInsightsDialog } from "./QuickInsightsDialog";
 
 const InsightPreview = ({ content }: { content: string }) => {

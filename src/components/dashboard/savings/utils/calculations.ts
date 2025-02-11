@@ -3,7 +3,9 @@ import { SavingsGoalType, MonthlySavingsData, SavingsProjection } from "@/types/
 import { format, addMonths } from "date-fns";
 import { CHART_CONSTANTS } from "./constants";
 
-export const calculateTrendIndicator = (current: number, previous: number) => {
+export type TrendIndicator = 'up' | 'down' | 'stable';
+
+export const calculateTrendIndicator = (current: number, previous: number): TrendIndicator => {
   const difference = current - previous;
   if (Math.abs(difference) < CHART_CONSTANTS.TREND_THRESHOLD) return 'stable';
   return difference > 0 ? 'up' : 'down';
