@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CircleUserRound, Settings } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
+import { ROUTES } from "@/config/routeConstants";
 
 export const Sidebar = () => {
   const navigate = useNavigate();
@@ -22,16 +23,16 @@ export const Sidebar = () => {
   const { profile } = useProfile();
 
   const navigation = [
-    { name: "Dashboard", href: "/", icon: Home },
-    { name: "Transactions", href: "/transactions", icon: List },
-    { name: "Budget", href: "/budget", icon: Wallet },
-    { name: "Savings Goals", href: "/savings-goals", icon: Target },
+    { name: "Dashboard", href: ROUTES.HOME, icon: Home },
+    { name: "Transactions", href: ROUTES.TRANSACTIONS, icon: List },
+    { name: "Budget", href: ROUTES.BUDGET, icon: Wallet },
+    { name: "Savings Goals", href: ROUTES.SAVINGS_GOALS, icon: Target },
   ];
 
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
-      navigate("/auth");
+      navigate(ROUTES.AUTH);
       toast.success("Logged out successfully");
     } catch (error) {
       toast.error("Error logging out");

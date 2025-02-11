@@ -1,6 +1,10 @@
 
 import { RouteObject } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { ROUTES } from "./routeConstants";
+import { lazy } from "react";
+
+// Pages
 import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import Categories from "@/pages/Categories";
@@ -10,10 +14,11 @@ import Budget from "@/pages/Budget";
 import Reminders from "@/pages/Reminders";
 import Settings from "@/pages/Settings";
 import SavingsGoals from "@/pages/SavingsGoals";
+import NotFound from "@/pages/NotFound";
 
 export const routes: RouteObject[] = [
   {
-    path: "/",
+    path: ROUTES.HOME,
     element: (
       <ProtectedRoute>
         <Index />
@@ -21,11 +26,11 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/auth",
+    path: ROUTES.AUTH,
     element: <Auth />,
   },
   {
-    path: "/categories",
+    path: ROUTES.CATEGORIES,
     element: (
       <ProtectedRoute>
         <Categories />
@@ -33,7 +38,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/transactions",
+    path: ROUTES.TRANSACTIONS,
     element: (
       <ProtectedRoute>
         <Transactions />
@@ -41,7 +46,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/transactions/import",
+    path: ROUTES.TRANSACTION_IMPORT,
     element: (
       <ProtectedRoute>
         <TransactionImport />
@@ -49,7 +54,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/budget",
+    path: ROUTES.BUDGET,
     element: (
       <ProtectedRoute>
         <Budget />
@@ -57,7 +62,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/reminders",
+    path: ROUTES.REMINDERS,
     element: (
       <ProtectedRoute>
         <Reminders />
@@ -65,7 +70,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/settings",
+    path: ROUTES.SETTINGS,
     element: (
       <ProtectedRoute>
         <Settings />
@@ -73,11 +78,15 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/savings-goals",
+    path: ROUTES.SAVINGS_GOALS,
     element: (
       <ProtectedRoute>
         <SavingsGoals />
       </ProtectedRoute>
     ),
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ];

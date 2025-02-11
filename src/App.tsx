@@ -8,12 +8,13 @@ import { BrowserRouter, useRoutes } from "react-router-dom";
 import { MonthProvider } from "@/contexts/MonthContext";
 import { routes } from "@/config/routes";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorBoundary } from "react-error-boundary";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 30000, // Data stays fresh for 30 seconds
-      gcTime: 1800000, // Cache data for 30 minutes
+      staleTime: 30000,
+      gcTime: 1800000,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
       retry: 1,
@@ -21,12 +22,10 @@ const queryClient = new QueryClient({
   },
 });
 
-// Create a proper React component for routes
 function Routes() {
   return useRoutes(routes);
 }
 
-// Lazy load the Routes component
 const LazyRoutes = lazy(() => Promise.resolve({ default: Routes }));
 
 const LoadingFallback = () => (
@@ -40,16 +39,26 @@ const LoadingFallback = () => (
   </div>
 );
 
+const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
+  <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
+    <p className="text-muted-foreground mb-4">{error.message}</p>
+    <Button onClick={resetErrorBoundary}>Try again</Button>
+  </div>
+);
+
 const AppContent = () => (
-  <TooltipProvider>
-    <MonthProvider>
-      <Toaster />
-      <Sonner />
-      <Suspense fallback={<LoadingFallback />}>
-        <LazyRoutes />
-      </Suspense>
-    </MonthProvider>
-  </TooltipProvider>
+  <ErrorBoundary FallbackComponent={ErrorFallback}>
+    <TooltipProvider>
+      <MonthProvider>
+        <Toaster />
+        <Sonner />
+        <Suspense fallback={<LoadingFallback />}>
+          <LazyRoutes />
+        </Suspense>
+      </MonthProvider>
+    </TooltipProvider>
+  </ErrorBoundary>
 );
 
 const App = () => (
