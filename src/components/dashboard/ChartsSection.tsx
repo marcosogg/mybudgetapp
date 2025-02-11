@@ -1,3 +1,5 @@
+
+import { memo } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { BudgetComparisonChart } from "./BudgetComparisonChart";
@@ -6,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { SavingsChart } from "./savings/SavingsChart";
 import { QuickInsightsDialog } from "./QuickInsightsDialog";
 
-const InsightPreview = ({ content }: { content: string }) => {
+const InsightPreview = memo(({ content }: { content: string }) => {
   const isPositive = content.toLowerCase().includes('under') || 
                      content.toLowerCase().includes('no transactions');
   
@@ -25,9 +27,14 @@ const InsightPreview = ({ content }: { content: string }) => {
       <p className="text-sm leading-tight line-clamp-2">{content}</p>
     </div>
   );
-};
+});
 
-export function ChartsSection() {
+InsightPreview.displayName = "InsightPreview";
+
+const MemoizedBudgetComparisonChart = memo(BudgetComparisonChart);
+const MemoizedSavingsChart = memo(SavingsChart);
+
+export const ChartsSection = memo(function ChartsSection() {
   const { insights, isLoading, error } = useAIInsights();
 
   // Get first 2 insights for preview
@@ -35,7 +42,7 @@ export function ChartsSection() {
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      <BudgetComparisonChart />
+      <MemoizedBudgetComparisonChart />
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <div className="space-y-1">
@@ -44,9 +51,10 @@ export function ChartsSection() {
           </div>
         </CardHeader>
         <CardContent>
-          <SavingsChart />
+          <MemoizedSavingsChart />
         </CardContent>
       </Card>
     </div>
   );
-}
+});
+

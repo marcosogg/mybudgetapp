@@ -12,9 +12,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      gcTime: 10 * 60 * 1000, // 10 minutes
-      staleTime: 5000,
+      staleTime: 30000, // Data stays fresh for 30 seconds
+      gcTime: 1800000, // Cache data for 30 minutes
       refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: 1,
     },
   },
 });
