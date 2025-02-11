@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -62,9 +63,9 @@ export const useProfile = () => {
         .select("*")
         .eq("user_id", user.id)
         .eq("month", monthString)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== "PGRST116") throw error; // PGRST116 is "no rows returned"
+      if (error) throw error;
       return data as MonthlyIncome | null;
     },
   });
