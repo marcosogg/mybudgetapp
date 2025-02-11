@@ -2,12 +2,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { startOfYear, format, addMonths } from "date-fns";
-import type { SavingsChartData, MonthlySavingsData } from "@/types/savings";
+import type { SavingsChartData, MonthlySavingsData, SavingsGoal, SavingsGoalType } from "@/types/savings";
 import { calculateProjections, calculateTrendIndicator } from "../utils/calculations";
 
 async function fetchSavingsData(): Promise<SavingsChartData> {
   // Check authentication first
-  const { data: authData, error: authError } = await supabase.auth.getSession();
+  const { data: authData, error: authError } = await supabase.auth.getUser();
   
   if (authError) {
     console.error("Authentication error:", authError);
@@ -44,7 +44,12 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
   // Get current savings goal
   const { data: goalData, error: goalError } = await supabase
     .from("savings_goals")
-    .select("id, user_id, name, goal_type, target_amount, recurring_amount, period_start, period_end, notes, created_at")
+    .select(`
+      id, user_id, name, goal_type,
+      target_amount, recurring_amount,
+      period_start, period_end,
+      notes, created_at
+    `)
     .eq("user_id", user.id)
     .is("period_end", null)
     .maybeSingle();
@@ -65,7 +70,7 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
     id: goalData.id,
     user_id: goalData.user_id,
     name: goalData.name,
-    goal_type: goalData.goal_type,
+    goal_type: goalData.goal_type as SavingsGoalType,
     target_amount: Number(goalData.target_amount),
     recurring_amount: goalData.recurring_amount ? Number(goalData.recurring_amount) : undefined,
     period_start: goalData.period_start ? new Date(goalData.period_start) : undefined,
@@ -117,7 +122,7 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
   }, {...monthsMap}); // Start with all months initialized to 0
 
   Object.entries(monthlyAmounts || {}).forEach(([month, amount]) => {
-    const monthlyGoalAmount = currentGoal ? currentGoal.target_amount / 12 : 0;
+    const monthlyGoalAmount = currentGoal?.recurring_amount || (currentGoal?.target_amount ? currentGoal.target_amount / 12 : 0);
     
     monthlyData.push({
       month,
