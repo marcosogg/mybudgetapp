@@ -1,3 +1,4 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { startOfYear, addMonths } from "date-fns";
@@ -12,12 +13,18 @@ export function useMonthlyBudgetComparison() {
   return useQuery({
     queryKey: ['monthlyBudgetComparison'],
     queryFn: async () => {
-      const startDate = startOfYear(new Date(2025, 0, 1));
-      const endDate = addMonths(startDate, 5);
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      const startDate = startOfYear(new Date());
+      const endDate = addMonths(startDate, 11); // Get full year of data
 
       const { data, error } = await supabase
         .rpc('get_monthly_budget_comparison', {
-          p_user_id: (await supabase.auth.getUser()).data.user?.id,
+          p_user_id: user.id,
           p_start_date: startDate.toISOString(),
           p_end_date: endDate.toISOString()
         });
