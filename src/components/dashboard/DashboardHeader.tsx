@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { GreetingHeader } from "./GreetingHeader";
 import { QuickInsightsDialog } from "./QuickInsightsDialog";
 import { useState } from "react";
-import { SimpleGoalDialog } from "../savings/SimpleGoalDialog";
+import { SimpleGoalDialog } from "@/components/savings/SimpleGoalDialog";
 
 export function DashboardHeader() {
   const navigate = useNavigate();
