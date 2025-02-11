@@ -20,4 +20,10 @@ export interface SavingsProgress {
   expected_amount: number;
   percentage: number;
   is_on_track: boolean;
+  projection_end_amount?: number;
+}
+
+export interface Transaction {
+  date: string;
+  amount: number;
 }
