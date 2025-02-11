@@ -1,5 +1,6 @@
+
 import { DollarSign, PieChart, Wallet } from "lucide-react";
-import { FeatureItem } from "./FeatureItem";
+import { FeatureItem } from "../shared/FeatureItem";
 
 export const Features = () => {
   return (
