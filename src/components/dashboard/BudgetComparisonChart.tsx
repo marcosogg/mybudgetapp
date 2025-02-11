@@ -1,10 +1,14 @@
+
 import { TrendingUp, TrendingDown, LineChart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { useMonthlyBudgetComparison } from "@/hooks/budget/useMonthlyBudgetComparison";
 import { format, subMonths } from "date-fns";
 import { useMonth } from "@/contexts/MonthContext";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const chartConfig = {
   planned: {
@@ -23,7 +27,39 @@ export function BudgetComparisonChart() {
   const startDate = subMonths(selectedMonth, 2);
   const endDate = selectedMonth;
   
-  const { data: comparison } = useMonthlyBudgetComparison();
+  const { data: comparison, isLoading, error } = useMonthlyBudgetComparison();
+
+  console.log('BudgetComparisonChart - Data:', comparison);
+  console.log('BudgetComparisonChart - Selected Month:', selectedMonth);
+
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Monthly Budget Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>Failed to load budget comparison data</AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Monthly Budget Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[350px] w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   // Process and sort the data to ensure we have exactly 3 months
   const chartData = Array.from({ length: 3 }, (_, index) => {
@@ -32,6 +68,8 @@ export function BudgetComparisonChart() {
       (item) => format(new Date(item.month), 'yyyy-MM') === format(monthDate, 'yyyy-MM')
     );
 
+    console.log('Processing month:', format(monthDate, 'yyyy-MM'), 'Data:', monthData);
+
     return {
       month: format(monthDate, 'MMMM'),
       monthDate, // Keep the full date for sorting
@@ -39,6 +77,8 @@ export function BudgetComparisonChart() {
       actual: monthData?.actual_total || 0,
     };
   }).sort((a, b) => a.monthDate.getTime() - b.monthDate.getTime());
+
+  console.log('Processed Chart Data:', chartData);
 
   // Calculate trend percentage based on the last two months
   const lastTwoMonths = chartData.slice(-2);
@@ -58,13 +98,18 @@ export function BudgetComparisonChart() {
       <CardContent>
         <ChartContainer config={chartConfig}>
           <BarChart data={chartData} height={350}>
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={false} strokeDasharray="3 3" />
             <XAxis
               dataKey="month"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
               tickFormatter={(value) => value.slice(0, 3)}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(value) => `$${value}`}
             />
             <ChartTooltip
               cursor={false}
