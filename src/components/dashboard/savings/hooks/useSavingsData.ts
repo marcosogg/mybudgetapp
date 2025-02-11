@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { startOfYear, format, addMonths } from "date-fns";
 import type { SavingsChartData, MonthlySavingsData } from "@/types/savings";
-import { calculateTrendIndicator } from "../utils/calculations";
+import { calculateTrendIndicator, calculateProjections } from "../utils/calculations";
 
 async function fetchSavingsData(): Promise<SavingsChartData> {
   // Check authentication first
@@ -33,7 +33,8 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
       yearTotal: 0,
       currentGoal: null,
       averageMonthlySavings: 0,
-      goalProgress: 0
+      goalProgress: 0,
+      projections: []
     };
   }
 
@@ -52,7 +53,8 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
       yearTotal: 0,
       currentGoal: null,
       averageMonthlySavings: 0,
-      goalProgress: 0
+      goalProgress: 0,
+      projections: []
     };
   }
 
@@ -60,6 +62,7 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
     id: goalData.id,
     user_id: goalData.user_id,
     name: goalData.name,
+    goal_type: 'one_time', // Set default goal type since we've simplified the schema
     target_amount: Number(goalData.target_amount),
     notes: goalData.notes,
     progress: Number(goalData.progress),
@@ -130,12 +133,16 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
     ? (yearTotal / currentGoal.target_amount) * 100 
     : 0;
 
+  // Calculate projections based on historical data
+  const projections = calculateProjections(monthlyData);
+
   return { 
     monthlyData, 
     yearTotal,
     currentGoal,
     averageMonthlySavings,
-    goalProgress
+    goalProgress,
+    projections
   };
 }
 
