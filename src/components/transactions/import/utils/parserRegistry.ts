@@ -1,3 +1,4 @@
+
 import { StatementParser } from "./baseParser";
 import { RevolutParser } from "../formats/revolut/revolutParser";
 import { WiseParser } from "../formats/wise/wiseParser";
@@ -18,4 +19,11 @@ export const detectFormat = (headers: string[]): StatementFormat => {
     return "wise";
   }
   return "revolut";
+};
+
+export const SUPPORTED_FORMATS = ['revolut', 'wise'] as const;
+
+export const FORMAT_LABELS: Record<StatementFormat, string> = {
+  revolut: 'Revolut',
+  wise: 'Wise'
 };

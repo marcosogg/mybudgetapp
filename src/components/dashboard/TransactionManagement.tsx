@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, FileUp } from "lucide-react";
@@ -7,7 +8,7 @@ interface TransactionManagementProps {
   transactionCount: number | null;
 }
 
-export const TransactionManagement = ({ transactionCount }: TransactionManagementProps) => {
+export function TransactionManagement({ transactionCount }: TransactionManagementProps) {
   const navigate = useNavigate();
 
   return (
@@ -16,7 +17,7 @@ export const TransactionManagement = ({ transactionCount }: TransactionManagemen
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <span className="text-muted-foreground">Total Transactions</span>
-          <span className="text-2xl font-bold">{transactionCount}</span>
+          <span className="text-2xl font-bold">{transactionCount ?? 0}</span>
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Button 
@@ -39,4 +40,4 @@ export const TransactionManagement = ({ transactionCount }: TransactionManagemen
       </div>
     </Card>
   );
-};
+}

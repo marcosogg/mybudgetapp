@@ -1,3 +1,4 @@
+
 export interface Transaction {
   id: string;
   user_id: string;
@@ -9,4 +10,29 @@ export interface Transaction {
   category?: {
     name: string;
   } | null;
+}
+
+// Transaction form types
+export interface TransactionFormValues {
+  date: string;
+  description: string;
+  amount: string;
+  category_id?: string;
+  tags?: string[];
+}
+
+// Utility type for transaction statistics
+export interface TransactionStats {
+  count: number;
+  total: number;
+  average: number;
+  categoryBreakdown: CategoryBreakdown[];
+}
+
+interface CategoryBreakdown {
+  category_id: string;
+  category_name: string;
+  total: number;
+  count: number;
+  percentage: number;
 }

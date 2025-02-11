@@ -1,5 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatCurrency } from "@/utils/budget/calculations";
 
 interface TransactionSummaryCardProps {
   count: number;
@@ -7,8 +8,6 @@ interface TransactionSummaryCardProps {
 }
 
 export function TransactionSummaryCard({ count, total }: TransactionSummaryCardProps) {
-  console.log('TransactionSummaryCard rendered with:', { count, total });
-  
   return (
     <Card>
       <CardHeader>
@@ -22,7 +21,7 @@ export function TransactionSummaryCard({ count, total }: TransactionSummaryCardP
           </div>
           <div className="flex justify-between pt-4 border-t">
             <span className="font-medium">Total Spent</span>
-            <span className="font-bold text-primary">${total.toLocaleString()}</span>
+            <span className="font-bold text-primary">{formatCurrency(total)}</span>
           </div>
         </div>
       </CardContent>

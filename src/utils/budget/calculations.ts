@@ -1,3 +1,4 @@
+
 /**
  * Budget calculation utility functions
  */
@@ -32,4 +33,16 @@ export const calculateTotalSpent = (
   comparison: Array<{ actual_amount: number }> = []
 ): number => {
   return comparison.reduce((sum, item) => sum + item.actual_amount, 0);
+};
+
+/**
+ * Format currency value for display
+ */
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(amount);
 };
