@@ -1,5 +1,5 @@
 
-import { SavingsGoalType, MonthlySavingsData, SavingsProjection } from "@/types/savings";
+import { MonthlySavingsData, SavingsProjection } from "@/types/savings";
 import { format, addMonths } from "date-fns";
 import { CHART_CONSTANTS } from "./constants";
 
@@ -38,4 +38,4 @@ export const calculateProjections = (
   }
 
   return projections;
-}
+};
