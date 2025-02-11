@@ -1,8 +1,7 @@
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { GOAL_TYPE_LABELS, GOAL_TYPE_DESCRIPTIONS } from "@/features/savings/utils/constants";
-import type { SavingsGoalType } from "@/features/savings/types/goal";
+import { GOAL_TYPE_LABELS, GOAL_TYPE_DESCRIPTIONS, SavingsGoalType } from "@/features/savings/types/goal";
 
 interface GoalTypeSelectProps {
   value: SavingsGoalType;
