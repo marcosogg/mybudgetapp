@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { CategoryBadge } from "./CategoryBadge";
@@ -5,7 +6,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Transaction } from "@/types/transaction";
 import { getTagStyle } from "@/utils/tagUtils";
-import { format, parse, isValid } from "date-fns";
+import { format, isValid } from "date-fns";
 import {
   AlertDialog,
   AlertDialogAction,
