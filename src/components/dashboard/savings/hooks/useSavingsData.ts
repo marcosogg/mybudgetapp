@@ -7,20 +7,17 @@ import { calculateProjections, calculateTrendIndicator } from "../utils/calculat
 
 async function fetchSavingsData(): Promise<SavingsChartData> {
   // Check authentication first
-  const { data: authData, error: authError } = await supabase.auth.getUser();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
   
   if (authError) {
     console.error("Authentication error:", authError);
     throw new Error("Authentication failed");
   }
 
-  if (!authData.session) {
-    console.error("No active session");
+  if (!user) {
+    console.error("No active user");
     throw new Error("Not authenticated");
   }
-
-  const user = authData.session.user;
-  if (!user) throw new Error("User not authenticated");
 
   // Get the savings category ID
   const { data: savingsCategory } = await supabase
