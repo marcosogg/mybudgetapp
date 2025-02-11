@@ -1,6 +1,10 @@
+
 import { Transaction } from "@/types/transaction";
 import { SortField, SortOrder } from "../types";
 
+/**
+ * Filter transactions based on search term, category, and tags
+ */
 export const filterTransactions = (
   transactions: Transaction[],
   searchTerm: string,
@@ -28,6 +32,9 @@ export const filterTransactions = (
   return filtered;
 };
 
+/**
+ * Sort transactions based on field and order
+ */
 export const sortTransactions = (
   transactions: Transaction[],
   sortField: SortField,
@@ -51,6 +58,9 @@ export const sortTransactions = (
   });
 };
 
+/**
+ * Format currency for display
+ */
 export const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',

@@ -1,6 +1,9 @@
+
 import { Circle, Diamond, Square, Triangle } from "lucide-react";
 
-// Hash function to get consistent index for tags
+/**
+ * Hash function to get consistent index for tags
+ */
 const getHashIndex = (str: string, max: number): number => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -10,6 +13,9 @@ const getHashIndex = (str: string, max: number): number => {
   return Math.abs(hash) % max;
 };
 
+/**
+ * Normalize tags to consistent format
+ */
 export const normalizeTags = (input: string): string[] => {
   return input
     .split(',')
@@ -34,6 +40,9 @@ export const TAG_COLORS = [
   { bg: "bg-purple-100 hover:bg-purple-200", text: "text-purple-700", icon: Triangle },
 ];
 
+/**
+ * Get consistent style for a tag
+ */
 export const getTagStyle = (tag: string) => {
   const index = getHashIndex(tag, TAG_COLORS.length);
   return TAG_COLORS[index];
