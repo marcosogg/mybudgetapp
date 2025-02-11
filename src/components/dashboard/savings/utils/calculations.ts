@@ -1,20 +1,19 @@
 
-import type { MonthlySavingsData, SavingsProjection } from "@/types/savings";
-import { addMonths, format } from "date-fns";
+import { SavingsGoalType, MonthlySavingsData, SavingsProjection } from "@/types/savings";
+import { format, addMonths } from "date-fns";
+import { CHART_CONSTANTS } from "./constants";
 
-export type TrendIndicator = 'up' | 'down' | 'stable';
-
-export function calculateTrendIndicator(current: number, previous: number): TrendIndicator {
+export const calculateTrendIndicator = (current: number, previous: number) => {
   const difference = current - previous;
-  if (Math.abs(difference) < 10) return 'stable';
+  if (Math.abs(difference) < CHART_CONSTANTS.TREND_THRESHOLD) return 'stable';
   return difference > 0 ? 'up' : 'down';
-}
+};
 
-export function calculateProjections(
+export const calculateProjections = (
   historicalData: MonthlySavingsData[],
-  monthsAhead: number = 2
-): SavingsProjection[] {
-  if (historicalData.length < 3) return [];
+  monthsAhead: number = CHART_CONSTANTS.MONTHS_TO_PROJECT
+): SavingsProjection[] => {
+  if (historicalData.length < CHART_CONSTANTS.MIN_MONTHS_FOR_PROJECTION) return [];
 
   const last3Months = historicalData.slice(-3);
   const avgChange = last3Months.reduce((sum, curr, idx, arr) => {
@@ -32,7 +31,7 @@ export function calculateProjections(
     projections.push({
       month: format(projectedDate, "MMM"),
       projected_amount: projectedAmount,
-      confidence_score: 1 - (i * 0.2) // Confidence decreases as we project further
+      confidence_score: 1 - (i * CHART_CONSTANTS.CONFIDENCE_DECREASE_RATE)
     });
   }
 

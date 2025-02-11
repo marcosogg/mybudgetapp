@@ -12,8 +12,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
+      gcTime: 10 * 60 * 1000, // 10 minutes
       staleTime: 5000,
-      cacheTime: 10 * 60 * 1000,
       refetchOnWindowFocus: false,
     },
   },
@@ -21,8 +21,8 @@ const queryClient = new QueryClient({
 
 // Lazy load routes
 const AppRoutes = lazy(() => {
-  const routes = useRoutes(routes);
-  return Promise.resolve({ default: () => routes });
+  const element = useRoutes(routes);
+  return Promise.resolve({ default: () => element });
 });
 
 const LoadingFallback = () => (

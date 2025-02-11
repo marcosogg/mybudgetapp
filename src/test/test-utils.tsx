@@ -16,7 +16,7 @@ function createWrapper({ children }: PropsWithChildren) {
         retry: false,
         // Add caching configuration for better performance
         staleTime: 5000, // Data considered fresh for 5 seconds
-        cacheTime: 10 * 60 * 1000, // Cache data for 10 minutes
+        gcTime: 10 * 60 * 1000, // Cache data for 10 minutes
       },
     },
   }), []);
@@ -49,4 +49,3 @@ export * from '@testing-library/react';
 
 // Override render method
 export { customRender as render };
-

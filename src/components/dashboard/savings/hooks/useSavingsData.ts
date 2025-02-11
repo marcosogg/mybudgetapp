@@ -151,7 +151,7 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
 }
 
 export function useSavingsData() {
-  return useQuery<SavingsChartData, Error>({
+  return useQuery({
     queryKey: ["savings-trend"],
     queryFn: fetchSavingsData,
   });

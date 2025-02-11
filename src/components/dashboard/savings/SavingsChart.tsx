@@ -108,7 +108,7 @@ export function SavingsChart() {
             <Bar
               dataKey="amount"
               fill="hsl(var(--primary))"
-              radius={[4, 4, 0, 0] as [number, number, number, number]}
+              radius={CHART_CONSTANTS.BAR_RADIUS}
               fillOpacity={CHART_CONSTANTS.FILL_OPACITY}
               isAnimationActive={false}
             />
