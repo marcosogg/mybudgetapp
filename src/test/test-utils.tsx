@@ -1,5 +1,5 @@
 
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useMemo } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -9,13 +9,17 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
  * @returns Wrapped components with QueryClientProvider
  */
 function createWrapper({ children }: PropsWithChildren) {
-  const queryClient = new QueryClient({
+  // Memoize queryClient to prevent unnecessary re-renders
+  const queryClient = useMemo(() => new QueryClient({
     defaultOptions: {
       queries: {
         retry: false,
+        // Add caching configuration for better performance
+        staleTime: 5000, // Data considered fresh for 5 seconds
+        cacheTime: 10 * 60 * 1000, // Cache data for 10 minutes
       },
     },
-  });
+  }), []);
 
   return (
     <QueryClientProvider client={queryClient}>
