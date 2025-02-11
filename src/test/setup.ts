@@ -25,3 +25,40 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+// Mock ResizeObserver
+class ResizeObserverMock {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+
+window.ResizeObserver = ResizeObserverMock;
+
+// Mock Intersection Observer
+class IntersectionObserverMock {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+
+window.IntersectionObserver = IntersectionObserverMock;
+
+// Mock Supabase client
+vi.mock('@/integrations/supabase/client', () => ({
+  supabase: {
+    auth: {
+      getUser: vi.fn(),
+      getSession: vi.fn(),
+    },
+    from: vi.fn(() => ({
+      select: vi.fn(),
+      insert: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+      eq: vi.fn(),
+    })),
+    functions: {
+      invoke: vi.fn(),
+    },
+  },
+}));
