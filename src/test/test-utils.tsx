@@ -3,11 +3,12 @@ import React, { PropsWithChildren } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-// Create a custom render function that includes providers
-function customRender(
-  ui: React.ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>,
-) {
+/**
+ * Creates a wrapper provider for testing components that use React Query
+ * @param children Components to be wrapped
+ * @returns Wrapped components with QueryClientProvider
+ */
+function createWrapper({ children }: PropsWithChildren) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -16,12 +17,25 @@ function customRender(
     },
   });
 
+  return (
+    <QueryClientProvider client={queryClient}>
+      {children}
+    </QueryClientProvider>
+  );
+}
+
+/**
+ * Custom render function that includes necessary providers
+ * @param ui Component to render
+ * @param options Additional render options
+ * @returns Rendered component with all required providers
+ */
+function customRender(
+  ui: React.ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>,
+) {
   return render(ui, {
-    wrapper: ({ children }: PropsWithChildren) => (
-      <QueryClientProvider client={queryClient}>
-        {children}
-      </QueryClientProvider>
-    ),
+    wrapper: createWrapper,
     ...options,
   });
 }
@@ -31,3 +45,4 @@ export * from '@testing-library/react';
 
 // Override render method
 export { customRender as render };
+

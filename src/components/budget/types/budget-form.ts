@@ -1,6 +1,12 @@
 
 import { z } from "zod";
 
+/**
+ * Zod schema for budget form validation
+ * Ensures:
+ * - Category is selected
+ * - Amount is a valid positive number
+ */
 export const budgetFormSchema = z.object({
   category_id: z.string().min(1, "Please select a category"),
   amount: z.string()
@@ -11,4 +17,6 @@ export const budgetFormSchema = z.object({
     ),
 });
 
+/** Type definition for budget form values derived from the schema */
 export type BudgetFormValues = z.infer<typeof budgetFormSchema>;
+

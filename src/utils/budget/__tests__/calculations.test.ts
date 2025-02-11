@@ -8,7 +8,16 @@ import {
 } from '../calculations';
 import { Budget } from '@/hooks/budget/types';
 
+/**
+ * Test suite for budget calculation utilities
+ * Covers core functionality for budget calculations including:
+ * - Total budget calculation
+ * - Remaining budget calculation
+ * - Budget percentage calculation
+ * - Currency formatting
+ */
 describe('Budget Calculations', () => {
+  // Mock budget data for testing
   const mockBudgets: Budget[] = [
     { id: '1', category_id: '1', amount: 100, period: '2024-01' },
     { id: '2', category_id: '2', amount: 200, period: '2024-01' },
@@ -70,3 +79,4 @@ describe('Budget Calculations', () => {
     });
   });
 });
+

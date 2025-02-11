@@ -4,13 +4,18 @@ import { expect, afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import * as matchers from '@testing-library/jest-dom/matchers';
 
+// Extend Jest matchers
 expect.extend(matchers);
 
+// Cleanup after each test
 afterEach(() => {
   cleanup();
 });
 
-// Mock window.matchMedia
+/**
+ * Mock window.matchMedia
+ * Required for components that use media queries
+ */
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation(query => ({
@@ -25,7 +30,10 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
-// Mock ResizeObserver
+/**
+ * Mock ResizeObserver
+ * Required for components that observe element dimensions
+ */
 class ResizeObserverMock {
   observe = vi.fn();
   unobserve = vi.fn();
@@ -34,7 +42,11 @@ class ResizeObserverMock {
 
 window.ResizeObserver = ResizeObserverMock;
 
-// Mock Intersection Observer
+/**
+ * Mock Intersection Observer
+ * Required for components that use intersection observer API
+ * Implements the IntersectionObserver interface
+ */
 class IntersectionObserverMock implements IntersectionObserver {
   readonly root: Element | null = null;
   readonly rootMargin: string = '0px';
@@ -58,7 +70,10 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: IntersectionObserverMock
 });
 
-// Mock Supabase client
+/**
+ * Mock Supabase client
+ * Provides mock implementations for Supabase auth and database operations
+ */
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     auth: {
@@ -77,3 +92,4 @@ vi.mock('@/integrations/supabase/client', () => ({
     },
   },
 }));
+
