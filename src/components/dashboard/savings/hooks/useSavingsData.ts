@@ -38,12 +38,13 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
     };
   }
 
-  // Get current savings goal
+  // Get current savings goal - get the most recent one
   const { data: goalData, error: goalError } = await supabase
     .from("savings_goals")
     .select("*")
     .eq("user_id", user.id)
     .order('created_at', { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (goalError) {
