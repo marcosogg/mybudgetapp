@@ -21,11 +21,10 @@ const queryClient = new QueryClient({
   },
 });
 
-// Create a separate component for routes
-const Routes = () => {
-  const element = useRoutes(routes);
-  return element;
-};
+// Create a proper React component for routes
+function Routes() {
+  return useRoutes(routes);
+}
 
 // Lazy load the Routes component
 const LazyRoutes = lazy(() => Promise.resolve({ default: Routes }));
