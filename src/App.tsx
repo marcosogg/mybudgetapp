@@ -9,6 +9,7 @@ import { MonthProvider } from "@/contexts/MonthContext";
 import { routes } from "@/config/routes";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
+import { Button } from "@/components/ui/button";
 
 const queryClient = new QueryClient({
   defaultOptions: {
