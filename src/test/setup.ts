@@ -35,13 +35,28 @@ class ResizeObserverMock {
 window.ResizeObserver = ResizeObserverMock;
 
 // Mock Intersection Observer
-class IntersectionObserverMock {
+class IntersectionObserverMock implements IntersectionObserver {
+  readonly root: Element | null = null;
+  readonly rootMargin: string = '0px';
+  readonly thresholds: readonly number[] = [0];
+  
+  constructor(
+    private callback: IntersectionObserverCallback,
+    private options?: IntersectionObserverInit
+  ) {}
+
   observe = vi.fn();
   unobserve = vi.fn();
   disconnect = vi.fn();
+  takeRecords = vi.fn().mockReturnValue([]);
 }
 
-window.IntersectionObserver = IntersectionObserverMock;
+// Override the native IntersectionObserver with our mock
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: IntersectionObserverMock
+});
 
 // Mock Supabase client
 vi.mock('@/integrations/supabase/client', () => ({
