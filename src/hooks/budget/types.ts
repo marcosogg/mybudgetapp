@@ -1,3 +1,4 @@
+
 import { Category } from "@/components/categories/types";
 
 export interface Budget {
