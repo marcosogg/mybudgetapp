@@ -1,7 +1,8 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfYear, addMonths } from "date-fns";
+import { startOfMonth, subMonths, endOfMonth } from "date-fns";
+import { useMonth } from "@/contexts/MonthContext";
 
 interface MonthlyComparison {
   month: string;
@@ -10,8 +11,14 @@ interface MonthlyComparison {
 }
 
 export function useMonthlyBudgetComparison() {
+  const { selectedMonth } = useMonth();
+  
+  // Get data for the selected month and 2 months prior
+  const startDate = startOfMonth(subMonths(selectedMonth, 2));
+  const endDate = endOfMonth(selectedMonth);
+
   return useQuery({
-    queryKey: ['monthlyBudgetComparison'],
+    queryKey: ['monthlyBudgetComparison', startDate.toISOString(), endDate.toISOString()],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       
@@ -19,8 +26,10 @@ export function useMonthlyBudgetComparison() {
         throw new Error("User not authenticated");
       }
 
-      const startDate = startOfYear(new Date());
-      const endDate = addMonths(startDate, 11); // Get full year of data
+      console.log('Fetching budget comparison for date range:', {
+        start: startDate.toISOString(),
+        end: endDate.toISOString()
+      });
 
       const { data, error } = await supabase
         .rpc('get_monthly_budget_comparison', {
@@ -29,7 +38,12 @@ export function useMonthlyBudgetComparison() {
           p_end_date: endDate.toISOString()
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching budget comparison:', error);
+        throw error;
+      }
+
+      console.log('Budget comparison data received:', data);
       return data as MonthlyComparison[];
     }
   });
