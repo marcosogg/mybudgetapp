@@ -21,11 +21,14 @@ const queryClient = new QueryClient({
   },
 });
 
-// Lazy load routes
-const AppRoutes = lazy(() => {
+// Create a separate component for routes
+const Routes = () => {
   const element = useRoutes(routes);
-  return Promise.resolve({ default: () => element });
-});
+  return element;
+};
+
+// Lazy load the Routes component
+const LazyRoutes = lazy(() => Promise.resolve({ default: Routes }));
 
 const LoadingFallback = () => (
   <div className="p-4">
@@ -44,7 +47,7 @@ const AppContent = () => (
       <Toaster />
       <Sonner />
       <Suspense fallback={<LoadingFallback />}>
-        <AppRoutes />
+        <LazyRoutes />
       </Suspense>
     </MonthProvider>
   </TooltipProvider>
