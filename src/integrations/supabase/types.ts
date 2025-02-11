@@ -250,42 +250,30 @@ export type Database = {
       savings_goals: {
         Row: {
           created_at: string
-          goal_type: string
           id: string
           name: string
           notes: string | null
-          period_end: string | null
-          period_start: string | null
           progress: number
-          recurring_amount: number | null
           target_amount: number
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          goal_type?: string
           id?: string
           name: string
           notes?: string | null
-          period_end?: string | null
-          period_start?: string | null
           progress?: number
-          recurring_amount?: number | null
           target_amount: number
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
-          goal_type?: string
           id?: string
           name?: string
           notes?: string | null
-          period_end?: string | null
-          period_start?: string | null
           progress?: number
-          recurring_amount?: number | null
           target_amount?: number
           updated_at?: string
           user_id?: string

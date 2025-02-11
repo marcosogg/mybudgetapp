@@ -1,3 +1,4 @@
+
 import { Tables } from './tables.types';
 
 export type Json =
