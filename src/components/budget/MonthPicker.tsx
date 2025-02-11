@@ -16,12 +16,11 @@ interface MonthPickerProps {
 }
 
 export function MonthPicker({ selectedMonth, onMonthChange, className }: MonthPickerProps) {
-  // Add validation and logging for debugging
   console.log('MonthPicker - selectedMonth:', selectedMonth);
   
   if (!(selectedMonth instanceof Date) || isNaN(selectedMonth.getTime())) {
     console.error('Invalid date provided to MonthPicker:', selectedMonth);
-    selectedMonth = new Date(); // Fallback to current date
+    selectedMonth = new Date();
   }
 
   const handlePreviousMonth = () => {
@@ -45,7 +44,7 @@ export function MonthPicker({ selectedMonth, onMonthChange, className }: MonthPi
         <Button
           variant="outline"
           className={cn(
-            "w-full justify-start text-left font-normal",
+            "w-full justify-start text-left font-normal h-11",
             className
           )}
         >
@@ -53,24 +52,26 @@ export function MonthPicker({ selectedMonth, onMonthChange, className }: MonthPi
           {formattedDate}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-2" align="start">
-        <div className="flex items-center justify-between gap-2">
+      <PopoverContent className="w-auto p-3" align="start">
+        <div className="flex items-center justify-between gap-4">
           <Button
             variant="outline"
             size="icon"
+            className="h-9 w-9"
             onClick={handlePreviousMonth}
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-5 w-5" />
           </Button>
-          <div className="text-center font-medium">
+          <div className="text-center font-medium min-w-[120px]">
             {formattedDate}
           </div>
           <Button
             variant="outline"
             size="icon"
+            className="h-9 w-9"
             onClick={handleNextMonth}
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-5 w-5" />
           </Button>
         </div>
       </PopoverContent>

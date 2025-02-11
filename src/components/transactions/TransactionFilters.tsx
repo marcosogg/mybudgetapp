@@ -52,25 +52,26 @@ export const TransactionFilters = ({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center">
-        <div className="flex gap-4 items-center">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center w-full sm:w-auto">
           <MonthPicker
             selectedMonth={selectedMonth}
             onMonthChange={onMonthChange}
+            className="w-full sm:w-auto min-w-[150px]"
           />
           <Input
             placeholder="Search transactions..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-sm"
+            className="w-full sm:max-w-sm"
           />
         </div>
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue placeholder="Filter by category" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="min-w-[180px]">
             <SelectItem value="all">All Categories</SelectItem>
             <SelectItem value="uncategorized">Uncategorized</SelectItem>
             {categories
@@ -91,7 +92,7 @@ export const TransactionFilters = ({
             <Badge
               key={tag}
               variant="secondary"
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 py-2 px-3"
             >
               <Tag className="h-3 w-3" />
               {tag}
@@ -99,10 +100,10 @@ export const TransactionFilters = ({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="h-4 w-4 p-0 hover:bg-transparent"
+                className="h-6 w-6 p-0 hover:bg-transparent ml-1"
                 onClick={() => removeTag(tag)}
               >
-                <X className="h-3 w-3" />
+                <X className="h-4 w-4" />
               </Button>
             </Badge>
           ))}
@@ -114,7 +115,7 @@ export const TransactionFilters = ({
               <Badge
                 key={tag}
                 variant="outline"
-                className="cursor-pointer hover:bg-secondary"
+                className="cursor-pointer hover:bg-secondary py-2 px-3"
                 onClick={() => addTag(tag)}
               >
                 <Tag className="h-3 w-3 mr-1" />
