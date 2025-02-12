@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
@@ -13,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Edit2, Trash2, ExternalLink } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
-import { SavingsDialog } from "@/components/budget/SavingsDialog";
+import { SavingsGoalDialog } from "./SavingsGoalDialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -159,7 +158,7 @@ export function SavingsGoalsTable() {
         </TableBody>
       </Table>
 
-      <SavingsDialog
+      <SavingsGoalDialog
         open={!!editGoal}
         onOpenChange={(open) => !open && setEditGoal(null)}
         currentSavings={0}

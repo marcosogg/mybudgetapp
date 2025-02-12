@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,7 +8,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { SavingsDialog } from "./SavingsDialog";
+import { SavingsGoalDialog } from "./savings/SavingsGoalDialog";
 import { toast } from "sonner";
 import { useSavingsGoal } from "@/hooks/useSavingsGoal";
 import { Progress } from "@/components/ui/progress";
@@ -173,7 +172,7 @@ export function SavingsSummary() {
         </CardContent>
       </Card>
 
-      <SavingsDialog
+      <SavingsGoalDialog
         open={isEditing}
         onOpenChange={handleDialogClose}
         currentSavings={progress?.current_amount || 0}

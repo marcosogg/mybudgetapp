@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Edit2, Plus } from "lucide-react";
 import { useState } from "react";
-import { SavingsDialog } from "../../budget/SavingsDialog";
+import { SavingsGoalDialog } from "./SavingsGoalDialog";
 import { SavingsGoalInfo } from "./SavingsGoalInfo";
 import { SavingsProgressDisplay } from "./SavingsProgressDisplay";
 import { useSavingsGoal } from "@/hooks/useSavingsGoal";
@@ -27,11 +27,10 @@ export function SavingsGoalsCard() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <SavingsGoalInfo currentGoal={currentGoal} />
-        <SavingsDialog
+        <SavingsGoalDialog
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
-          currentSavings={0}
-          targetAmount={currentGoal?.target_amount || 0}
+          mode="create"
         />
       </div>
       {currentGoal && (
