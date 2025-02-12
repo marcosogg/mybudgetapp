@@ -63,11 +63,20 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
     id: goalData.id,
     user_id: goalData.user_id,
     name: goalData.name,
+    goal_type: goalData.goal_type || 'custom', // Default to 'custom' if not set
     target_amount: Number(goalData.target_amount),
+    recurring_amount: goalData.recurring_amount ? Number(goalData.recurring_amount) : undefined,
+    period_start: goalData.period_start ? new Date(goalData.period_start) : undefined,
+    period_end: goalData.period_end ? new Date(goalData.period_end) : undefined,
     notes: goalData.notes,
-    progress: Number(goalData.progress),
+    progress: Number(goalData.progress || 0),
     created_at: new Date(goalData.created_at),
-    updated_at: new Date(goalData.updated_at)
+    updated_at: new Date(goalData.updated_at),
+    streak_count: Number(goalData.streak_count || 0),
+    last_contribution_date: goalData.last_contribution_date ? new Date(goalData.last_contribution_date) : undefined,
+    best_month_amount: goalData.best_month_amount ? Number(goalData.best_month_amount) : undefined,
+    best_month_date: goalData.best_month_date ? new Date(goalData.best_month_date) : undefined,
+    milestone_notifications: goalData.milestone_notifications ?? true
   } : null;
 
   // Get this year's savings data
