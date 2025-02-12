@@ -1,11 +1,8 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { SavingsGoal, SavingsProgress, SavingsGoalFormValues } from "@/types/savings";
-import { SavingsGoalService } from "@/lib/savings/savingsGoalService";
-import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-
-const savingsGoalService = new SavingsGoalService();
+import { toast } from "sonner";
 
 export function useSavingsGoal() {
   const queryClient = useQueryClient();
@@ -15,19 +12,68 @@ export function useSavingsGoal() {
     data: currentGoal,
     isLoading: isLoadingGoal,
     error: goalError 
-  } = useQuery<SavingsGoal | null>({
+  } = useQuery({
     queryKey: ['current-savings-goal'],
-    queryFn: () => savingsGoalService.getCurrentGoal()
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const { data, error } = await supabase
+        .from("savings_goals")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as SavingsGoal | null;
+    }
   });
 
-  // Query goal progress
+  // Calculate progress based on actual savings
   const {
     data: progress,
     isLoading: isLoadingProgress,
     error: progressError
-  } = useQuery<SavingsProgress>({
+  } = useQuery({
     queryKey: ['savings-progress', currentGoal?.id],
-    queryFn: () => currentGoal ? savingsGoalService.getGoalProgress(currentGoal.id) : null,
+    queryFn: async () => {
+      if (!currentGoal) return null;
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      // Get the savings category ID
+      const { data: category } = await supabase
+        .from("categories")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("name", "Savings")
+        .maybeSingle();
+
+      if (!category) return null;
+
+      // Get total savings amount
+      const { data: transactions } = await supabase
+        .from("transactions")
+        .select("amount")
+        .eq("category_id", category.id)
+        .eq("user_id", user.id);
+
+      const currentAmount = transactions?.reduce(
+        (sum, t) => sum + Math.abs(t.amount || 0),
+        0
+      ) || 0;
+
+      const percentage = (currentAmount / currentGoal.target_amount) * 100;
+      
+      return {
+        current_amount: currentAmount,
+        expected_amount: currentGoal.target_amount,
+        percentage,
+        is_on_track: percentage >= 90
+      } as SavingsProgress;
+    },
     enabled: !!currentGoal
   });
 
@@ -37,20 +83,23 @@ export function useSavingsGoal() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const goalData = {
-        user_id: user.id,
-        name: values.name,
-        goal_type: values.goal_type,
-        target_amount: parseFloat(values.target_amount),
-        recurring_amount: values.recurring_amount ? parseFloat(values.recurring_amount) : undefined,
-        period_start: values.period_start,
-        period_end: values.period_end,
-        notes: values.notes
-      };
+      const { data, error } = await supabase
+        .from("savings_goals")
+        .insert({
+          user_id: user.id,
+          name: values.name,
+          target_amount: parseFloat(values.target_amount),
+          notes: values.notes,
+          progress: 0
+        })
+        .select()
+        .single();
 
-      return savingsGoalService.createGoal(goalData);
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savings-goals'] });
       queryClient.invalidateQueries({ queryKey: ['current-savings-goal'] });
       toast.success("Savings goal created successfully");
     },
@@ -62,20 +111,23 @@ export function useSavingsGoal() {
 
   // Update goal mutation
   const updateGoal = useMutation({
-    mutationFn: async ({ id, values }: { id: string; values: Partial<SavingsGoalFormValues> }) => {
-      const updates: any = {};
-      
-      if (values.name) updates.name = values.name;
-      if (values.goal_type) updates.goal_type = values.goal_type;
-      if (values.target_amount) updates.target_amount = parseFloat(values.target_amount);
-      if (values.recurring_amount) updates.recurring_amount = parseFloat(values.recurring_amount);
-      if (values.period_start) updates.period_start = values.period_start;
-      if (values.period_end) updates.period_end = values.period_end;
-      if (values.notes !== undefined) updates.notes = values.notes;
+    mutationFn: async ({ id, values }: { id: string; values: SavingsGoalFormValues }) => {
+      const { data, error } = await supabase
+        .from("savings_goals")
+        .update({
+          name: values.name,
+          target_amount: parseFloat(values.target_amount),
+          notes: values.notes
+        })
+        .eq('id', id)
+        .select()
+        .single();
 
-      return savingsGoalService.updateGoal(id, updates);
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savings-goals'] });
       queryClient.invalidateQueries({ queryKey: ['current-savings-goal'] });
       toast.success("Savings goal updated successfully");
     },
@@ -89,11 +141,19 @@ export function useSavingsGoal() {
   const endCurrentGoal = useMutation({
     mutationFn: async () => {
       if (!currentGoal) throw new Error("No active goal to end");
-      return savingsGoalService.updateGoal(currentGoal.id, {
-        period_end: new Date()
-      });
+      
+      const { data, error } = await supabase
+        .from("savings_goals")
+        .delete()
+        .eq('id', currentGoal.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['savings-goals'] });
       queryClient.invalidateQueries({ queryKey: ['current-savings-goal'] });
       toast.success("Savings goal ended successfully");
     },
@@ -104,13 +164,10 @@ export function useSavingsGoal() {
   });
 
   return {
-    // Queries
     currentGoal,
     progress,
     isLoading: isLoadingGoal || isLoadingProgress,
     error: goalError || progressError,
-
-    // Mutations
     createGoal,
     updateGoal,
     endCurrentGoal,
