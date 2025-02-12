@@ -63,7 +63,6 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
     id: goalData.id,
     user_id: goalData.user_id,
     name: goalData.name,
-    goal_type: 'one_time', // Set default goal type since we've simplified the schema
     target_amount: Number(goalData.target_amount),
     notes: goalData.notes,
     progress: Number(goalData.progress),
