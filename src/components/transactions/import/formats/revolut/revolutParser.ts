@@ -1,3 +1,4 @@
+
 import { StatementParser, ParsedTransaction } from "../../utils/baseParser";
 import { formatDate } from "../../utils/baseParser";
 import { Transaction } from "@/types/transaction";
@@ -45,6 +46,7 @@ export const RevolutParser: StatementParser = {
       amount,
       tags: [],
       category_id: null,
+      savings_goal_id: null, // Add this field with null as default
     };
   }
 };
