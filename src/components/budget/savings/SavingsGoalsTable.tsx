@@ -138,7 +138,7 @@ export function SavingsGoalsTable() {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Delete Savings Goal</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Are you sure you want to delete this savings goal? This action cannot be undone.
+                            Are you sure you want to delete this savings goal? Any linked transactions will be unlinked but not deleted.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>

@@ -369,6 +369,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_transactions_savings_goals"
+            columns: ["savings_goal_id"]
+            isOneToOne: false
+            referencedRelation: "savings_goals"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "transactions_category_id_fkey"
             columns: ["category_id"]
             isOneToOne: false

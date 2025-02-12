@@ -47,15 +47,23 @@ export function SavingsGoalTransactions({ goal }: SavingsGoalTransactionsProps) 
     return <div className="text-muted-foreground text-sm">No transactions found for this savings goal.</div>;
   }
 
+  const totalAmount = transactions.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
   return (
     <div className="mt-4">
-      <h3 className="font-semibold mb-2">Contributing Transactions</h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-semibold">Contributing Transactions</h3>
+        <div className="text-sm text-muted-foreground">
+          Total Contribution: ${totalAmount.toLocaleString()}
+        </div>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Date</TableHead>
               <TableHead>Description</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Amount</TableHead>
             </TableRow>
           </TableHeader>
@@ -64,6 +72,7 @@ export function SavingsGoalTransactions({ goal }: SavingsGoalTransactionsProps) 
               <TableRow key={transaction.id}>
                 <TableCell>{format(new Date(transaction.date), 'MMM d, yyyy')}</TableCell>
                 <TableCell>{transaction.description}</TableCell>
+                <TableCell>{transaction.category?.name}</TableCell>
                 <TableCell>${Math.abs(transaction.amount).toLocaleString()}</TableCell>
               </TableRow>
             ))}
