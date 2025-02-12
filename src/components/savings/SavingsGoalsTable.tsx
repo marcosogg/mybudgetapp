@@ -64,11 +64,10 @@ export function SavingsGoalsTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Type</TableHead>
+            <TableHead>Name</TableHead>
             <TableHead>Target Amount</TableHead>
-            <TableHead>Period</TableHead>
             <TableHead>Progress</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Created</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -76,29 +75,15 @@ export function SavingsGoalsTable() {
           {goals?.map((goal) => (
             <TableRow key={goal.id}>
               <TableCell>
-                <Badge variant="outline">
-                  {goal.goal_type === 'one_time' ? 'One Time' :
-                   goal.goal_type === 'recurring_monthly' ? 'Monthly' : 'Yearly'}
-                </Badge>
+                <div>
+                  <p className="font-medium">{goal.name}</p>
+                  {goal.notes && (
+                    <p className="text-sm text-muted-foreground">{goal.notes}</p>
+                  )}
+                </div>
               </TableCell>
               <TableCell>
                 ${goal.target_amount.toLocaleString()}
-                {goal.recurring_amount && (
-                  <span className="text-sm text-muted-foreground">
-                    {' '}(${goal.recurring_amount.toLocaleString()}/
-                    {goal.goal_type === 'recurring_monthly' ? 'month' : 'year'})
-                  </span>
-                )}
-              </TableCell>
-              <TableCell>
-                <div className="text-sm">
-                  <div>{format(new Date(goal.period_start), 'MMM d, yyyy')}</div>
-                  {goal.period_end && (
-                    <div className="text-muted-foreground">
-                      to {format(new Date(goal.period_end), 'MMM d, yyyy')}
-                    </div>
-                  )}
-                </div>
               </TableCell>
               <TableCell>
                 <div className="w-[200px] space-y-1">
@@ -109,9 +94,7 @@ export function SavingsGoalsTable() {
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant={goal.period_end ? "secondary" : "default"}>
-                  {goal.period_end ? "Completed" : "Active"}
-                </Badge>
+                {format(new Date(goal.created_at), 'MMM d, yyyy')}
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">

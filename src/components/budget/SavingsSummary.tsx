@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,7 +12,6 @@ import { useState } from "react";
 import { SavingsDialog } from "./SavingsDialog";
 import { toast } from "sonner";
 import { useSavingsGoal } from "@/hooks/useSavingsGoal";
-import { GOAL_TYPE_LABELS } from "@/lib/savings/constants";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 
@@ -129,14 +129,7 @@ export function SavingsSummary() {
     <>
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <div>
-            <CardTitle>Savings</CardTitle>
-            {currentGoal && (
-              <p className="text-sm text-muted-foreground">
-                {GOAL_TYPE_LABELS[currentGoal.goal_type]}
-              </p>
-            )}
-          </div>
+          <CardTitle>Savings</CardTitle>
           <Button 
             variant="outline" 
             size="icon" 
@@ -155,15 +148,9 @@ export function SavingsSummary() {
             {currentGoal && (
               <>
                 <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    {currentGoal.goal_type === 'recurring_monthly' ? 'Monthly Target:' :
-                     currentGoal.goal_type === 'recurring_yearly' ? 'Yearly Target:' :
-                     'Target Goal:'}
-                  </span>
+                  <span className="text-sm text-muted-foreground">Target Goal:</span>
                   <span className="font-medium">
-                    ${(currentGoal.goal_type === 'recurring_monthly' ? currentGoal.recurring_amount :
-                       currentGoal.goal_type === 'recurring_yearly' ? currentGoal.recurring_amount :
-                       currentGoal.target_amount)?.toLocaleString() || 0}
+                    ${currentGoal.target_amount.toLocaleString()}
                   </span>
                 </div>
                 {progress && (
