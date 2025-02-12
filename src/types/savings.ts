@@ -1,4 +1,6 @@
 
+import { z } from "zod";
+
 // Basic type definitions
 export interface SavingsGoal {
   id: string;
