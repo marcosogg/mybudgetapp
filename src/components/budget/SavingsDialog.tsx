@@ -1,17 +1,14 @@
 
-import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useSavingsGoal } from "@/hooks/useSavingsGoal";
-import type { SavingsGoalType } from "@/types/savings";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import type { SavingsGoal, SavingsGoalFormValues } from "@/types/savings";
 import { savingsGoalSchema } from "@/types/savings";
-import type { SavingsGoalFormValues } from "@/types/savings";
-import { GoalTypeSelect } from "../savings/form/GoalTypeSelect";
-import { GoalAmountInput } from "../savings/form/GoalAmountInput";
-import { GoalDateFields } from "../savings/form/GoalDateFields";
-import { GoalNotesField } from "../savings/form/GoalNotesField";
-import { GoalFormActions } from "../savings/form/GoalFormActions";
+import { useSavingsGoal } from "@/hooks/useSavingsGoal";
 
 interface SavingsDialogProps {
   open: boolean;
@@ -26,20 +23,13 @@ export function SavingsDialog({
   currentSavings 
 }: SavingsDialogProps) {
   const { currentGoal, createGoal, updateGoal, endCurrentGoal } = useSavingsGoal();
-  const [selectedType, setSelectedType] = useState<SavingsGoalType>(
-    currentGoal?.goal_type || 'one_time'
-  );
 
   const form = useForm<SavingsGoalFormValues>({
     resolver: zodResolver(savingsGoalSchema),
     defaultValues: {
       name: currentGoal?.name || "",
-      goal_type: currentGoal?.goal_type || 'one_time',
       target_amount: currentGoal?.target_amount?.toString() || "",
-      recurring_amount: currentGoal?.recurring_amount?.toString() || "",
-      period_start: currentGoal?.period_start || new Date(),
-      period_end: currentGoal?.period_end,
-      notes: currentGoal?.notes || "",
+      notes: currentGoal?.notes || ""
     }
   });
 
@@ -55,7 +45,7 @@ export function SavingsDialog({
       }
       onOpenChange(false);
     } catch (error) {
-      // Error handling is done in the mutation callbacks
+      console.error("Error saving goal:", error);
     }
   };
 
@@ -64,7 +54,7 @@ export function SavingsDialog({
       await endCurrentGoal.mutateAsync();
       onOpenChange(false);
     } catch (error) {
-      // Error handling is done in the mutation callbacks
+      console.error("Error ending goal:", error);
     }
   };
 
@@ -77,37 +67,75 @@ export function SavingsDialog({
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <GoalTypeSelect
-            value={selectedType}
-            onChange={(value) => {
-              setSelectedType(value);
-              form.setValue("goal_type", value);
-            }}
-            disabled={!!currentGoal}
-          />
+          <div className="space-y-2">
+            <Label htmlFor="name">Goal Name</Label>
+            <Input
+              id="name"
+              {...form.register("name")}
+              placeholder="Enter goal name"
+            />
+            {form.formState.errors.name && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.name.message}
+              </p>
+            )}
+          </div>
 
-          <GoalAmountInput
-            goalType={selectedType}
-            register={form.register}
-            errors={form.formState.errors}
-          />
+          <div className="space-y-2">
+            <Label htmlFor="target_amount">Target Amount</Label>
+            <Input
+              id="target_amount"
+              type="number"
+              step="0.01"
+              min="0"
+              {...form.register("target_amount")}
+              placeholder="Enter target amount"
+            />
+            {form.formState.errors.target_amount && (
+              <p className="text-sm text-destructive">
+                {form.formState.errors.target_amount.message}
+              </p>
+            )}
+          </div>
 
-          <GoalDateFields
-            goalType={selectedType}
-            watch={form.watch}
-            setValue={form.setValue}
-            errors={form.formState.errors}
-          />
+          <div className="space-y-2">
+            <Label htmlFor="notes">Notes (Optional)</Label>
+            <Textarea
+              id="notes"
+              {...form.register("notes")}
+              placeholder="Add any notes about your goal"
+            />
+          </div>
 
-          <GoalNotesField register={form.register} />
-
-          <GoalFormActions 
-            mode={currentGoal ? 'edit' : 'create'}
-            goal={currentGoal}
-            onEndGoal={handleEndGoal}
-            isSubmitting={createGoal.isPending || updateGoal.isPending}
-            isEndingGoal={endCurrentGoal.isPending}
-          />
+          <div className="flex flex-col gap-2">
+            {currentSavings > 0 && (
+              <p className="text-sm text-muted-foreground">
+                Current savings: ${currentSavings.toLocaleString()}
+              </p>
+            )}
+            <div className="flex gap-2 justify-end">
+              {currentGoal && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleEndGoal}
+                  disabled={endCurrentGoal.isPending}
+                >
+                  End Goal
+                </Button>
+              )}
+              <Button
+                type="submit"
+                disabled={createGoal.isPending || updateGoal.isPending}
+              >
+                {createGoal.isPending || updateGoal.isPending
+                  ? "Saving..."
+                  : currentGoal
+                  ? "Update Goal"
+                  : "Create Goal"}
+              </Button>
+            </div>
+          </div>
         </form>
       </DialogContent>
     </Dialog>
