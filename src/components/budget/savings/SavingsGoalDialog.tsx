@@ -10,39 +10,41 @@ import type { SavingsGoal, SavingsGoalFormValues } from "@/types/savings";
 import { savingsGoalSchema } from "@/types/savings";
 import { useSavingsGoal } from "@/hooks/useSavingsGoal";
 
-interface SavingsDialogProps {
+interface SavingsGoalDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  currentSavings: number;
-  targetAmount: number;
+  mode: 'create' | 'edit';
+  goal?: SavingsGoal | null;
 }
 
-export function SavingsDialog({ 
+export function SavingsGoalDialog({ 
   open, 
-  onOpenChange, 
-  currentSavings 
-}: SavingsDialogProps) {
-  const { currentGoal, createGoal, updateGoal, endCurrentGoal } = useSavingsGoal();
+  onOpenChange,
+  mode,
+  goal
+}: SavingsGoalDialogProps) {
+  const { createGoal, updateGoal, endCurrentGoal } = useSavingsGoal();
 
   const form = useForm<SavingsGoalFormValues>({
     resolver: zodResolver(savingsGoalSchema),
     defaultValues: {
-      name: currentGoal?.name || "",
-      target_amount: currentGoal?.target_amount?.toString() || "",
-      notes: currentGoal?.notes || ""
+      name: goal?.name || "",
+      target_amount: goal?.target_amount?.toString() || "",
+      notes: goal?.notes || ""
     }
   });
 
-  const handleSubmit = async (values: SavingsGoalFormValues) => {
+  const onSubmit = async (values: SavingsGoalFormValues) => {
     try {
-      if (currentGoal) {
+      if (mode === 'edit' && goal) {
         await updateGoal.mutateAsync({
-          id: currentGoal.id,
+          id: goal.id,
           values
         });
       } else {
         await createGoal.mutateAsync(values);
       }
+      form.reset();
       onOpenChange(false);
     } catch (error) {
       console.error("Error saving goal:", error);
@@ -50,6 +52,7 @@ export function SavingsDialog({
   };
 
   const handleEndGoal = async () => {
+    if (!goal) return;
     try {
       await endCurrentGoal.mutateAsync();
       onOpenChange(false);
@@ -63,10 +66,10 @@ export function SavingsDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {currentGoal ? "Update Savings Goal" : "Set New Savings Goal"}
+            {mode === 'edit' ? "Update Savings Goal" : "Create New Savings Goal"}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Goal Name</Label>
             <Input
@@ -107,34 +110,27 @@ export function SavingsDialog({
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            {currentSavings > 0 && (
-              <p className="text-sm text-muted-foreground">
-                Current savings: ${currentSavings.toLocaleString()}
-              </p>
-            )}
-            <div className="flex gap-2 justify-end">
-              {currentGoal && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleEndGoal}
-                  disabled={endCurrentGoal.isPending}
-                >
-                  End Goal
-                </Button>
-              )}
+          <div className="flex gap-2 justify-end">
+            {mode === 'edit' && (
               <Button
-                type="submit"
-                disabled={createGoal.isPending || updateGoal.isPending}
+                type="button"
+                variant="outline"
+                onClick={handleEndGoal}
+                disabled={endCurrentGoal.isPending}
               >
-                {createGoal.isPending || updateGoal.isPending
-                  ? "Saving..."
-                  : currentGoal
-                  ? "Update Goal"
-                  : "Create Goal"}
+                End Goal
               </Button>
-            </div>
+            )}
+            <Button
+              type="submit"
+              disabled={createGoal.isPending || updateGoal.isPending}
+            >
+              {createGoal.isPending || updateGoal.isPending
+                ? "Saving..."
+                : mode === 'edit'
+                ? "Update Goal"
+                : "Create Goal"}
+            </Button>
           </div>
         </form>
       </DialogContent>
