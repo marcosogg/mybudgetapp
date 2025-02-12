@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -175,8 +176,8 @@ export function SavingsSummary() {
       <SavingsGoalDialog
         open={isEditing}
         onOpenChange={handleDialogClose}
-        currentSavings={progress?.current_amount || 0}
-        targetAmount={currentGoal?.target_amount || 0}
+        mode="edit"
+        goal={currentGoal}
       />
     </>
   );

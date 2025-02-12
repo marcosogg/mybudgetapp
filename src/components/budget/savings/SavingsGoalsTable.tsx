@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import {
@@ -161,8 +162,8 @@ export function SavingsGoalsTable() {
       <SavingsGoalDialog
         open={!!editGoal}
         onOpenChange={(open) => !open && setEditGoal(null)}
-        currentSavings={0}
-        targetAmount={editGoal?.target_amount || 0}
+        mode="edit"
+        goal={editGoal}
       />
     </div>
   );
