@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Edit2, Trash2, ExternalLink } from "lucide-react";
+import { Edit2, Trash2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
 import { SavingsGoalDialog } from "./SavingsGoalDialog";
@@ -18,12 +18,12 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { SavingsGoal } from "@/types/savings";
-import { useNavigate } from "react-router-dom";
+import { SavingsGoalTransactions } from "./SavingsGoalTransactions";
 
 export function SavingsGoalsTable() {
   const [editGoal, setEditGoal] = useState<SavingsGoal | null>(null);
+  const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   const { data: goals, isLoading } = useQuery({
     queryKey: ['savings-goals'],
@@ -61,18 +61,13 @@ export function SavingsGoalsTable() {
     }
   });
 
-  const viewTransactions = (goalId: string) => {
-    navigate('/transactions', { 
-      state: { 
-        filter: 'savings',
-        goalId 
-      } 
-    });
-  };
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+  const toggleTransactions = (goalId: string) => {
+    setExpandedGoalId(expandedGoalId === goalId ? null : goalId);
+  };
 
   return (
     <div className="rounded-md border">
@@ -88,73 +83,85 @@ export function SavingsGoalsTable() {
         </TableHeader>
         <TableBody>
           {goals?.map((goal) => (
-            <TableRow key={goal.id}>
-              <TableCell>
-                <div>
-                  <p className="font-medium">{goal.name}</p>
-                  {goal.notes && (
-                    <p className="text-sm text-muted-foreground">{goal.notes}</p>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>
-                ${goal.target_amount.toLocaleString()}
-              </TableCell>
-              <TableCell>
-                <div className="w-[200px] space-y-1">
-                  <Progress value={goal.progress} className="h-2" />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>${(goal.target_amount * (goal.progress / 100)).toLocaleString()}</span>
-                    <span>{goal.progress.toFixed(1)}%</span>
+            <>
+              <TableRow 
+                key={goal.id}
+                className="cursor-pointer hover:bg-muted/50"
+                onClick={() => toggleTransactions(goal.id)}
+              >
+                <TableCell>
+                  <div>
+                    <p className="font-medium">{goal.name}</p>
+                    {goal.notes && (
+                      <p className="text-sm text-muted-foreground">{goal.notes}</p>
+                    )}
                   </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                {format(new Date(goal.created_at), 'MMM d, yyyy')}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => viewTransactions(goal.id)}
-                    title="View Transactions"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setEditGoal(goal)}
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Delete Savings Goal</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete this savings goal? This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => deleteGoal.mutate(goal.id)}
+                </TableCell>
+                <TableCell>
+                  ${goal.target_amount.toLocaleString()}
+                </TableCell>
+                <TableCell>
+                  <div className="w-[200px] space-y-1">
+                    <Progress value={goal.progress} className="h-2" />
+                    <div className="flex justify-between text-xs text-muted-foreground">
+                      <span>${(goal.target_amount * (goal.progress / 100)).toLocaleString()}</span>
+                      <span>{goal.progress.toFixed(1)}%</span>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {format(new Date(goal.created_at), 'MMM d, yyyy')}
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditGoal(goal);
+                      }}
+                    >
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          onClick={(e) => e.stopPropagation()}
                         >
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              </TableCell>
-            </TableRow>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete Savings Goal</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete this savings goal? This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => deleteGoal.mutate(goal.id)}
+                          >
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </TableCell>
+              </TableRow>
+              {expandedGoalId === goal.id && (
+                <TableRow>
+                  <TableCell colSpan={5} className="bg-muted/50">
+                    <SavingsGoalTransactions goal={goal} />
+                  </TableCell>
+                </TableRow>
+              )}
+            </>
           ))}
         </TableBody>
       </Table>
