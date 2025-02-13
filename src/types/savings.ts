@@ -20,6 +20,7 @@ export interface SavingsGoal {
   best_month_amount?: number;
   best_month_date?: Date;
   milestone_notifications: boolean;
+  tag?: string;
 }
 
 export interface SavingsProgress {
@@ -28,31 +29,6 @@ export interface SavingsProgress {
   percentage: number;
   is_on_track: boolean;
   projection_end_amount?: number;
-}
-
-// Chart-related types
-export interface MonthlySavingsData {
-  month: string;
-  amount: number;
-  goal_amount: number;
-  percentage_of_goal: number;
-  trend_indicator: 'up' | 'down' | 'stable';
-  is_negative: boolean;
-}
-
-export interface SavingsProjection {
-  month: string;
-  projected_amount: number;
-  confidence_score: number;
-}
-
-export interface SavingsChartData {
-  monthlyData: MonthlySavingsData[];
-  yearTotal: number;
-  currentGoal: SavingsGoal | null;
-  averageMonthlySavings: number;
-  goalProgress: number;
-  projections: SavingsProjection[];
 }
 
 // Form-related types
