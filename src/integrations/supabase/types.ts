@@ -247,6 +247,92 @@ export type Database = {
           },
         ]
       }
+      savings_achievements: {
+        Row: {
+          achieved_at: string | null
+          goal_id: string
+          id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          achieved_at?: string | null
+          goal_id: string
+          id?: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          achieved_at?: string | null
+          goal_id?: string
+          id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "savings_achievements_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "savings_goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      savings_goals: {
+        Row: {
+          best_month_amount: number | null
+          best_month_date: string | null
+          created_at: string
+          goal_type: string | null
+          id: string
+          last_contribution_date: string | null
+          milestone_notifications: boolean | null
+          name: string
+          notes: string | null
+          progress: number
+          recurring_amount: number | null
+          streak_count: number | null
+          target_amount: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_month_amount?: number | null
+          best_month_date?: string | null
+          created_at?: string
+          goal_type?: string | null
+          id?: string
+          last_contribution_date?: string | null
+          milestone_notifications?: boolean | null
+          name: string
+          notes?: string | null
+          progress?: number
+          recurring_amount?: number | null
+          streak_count?: number | null
+          target_amount: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_month_amount?: number | null
+          best_month_date?: string | null
+          created_at?: string
+          goal_type?: string | null
+          id?: string
+          last_contribution_date?: string | null
+          milestone_notifications?: boolean | null
+          name?: string
+          notes?: string | null
+          progress?: number
+          recurring_amount?: number | null
+          streak_count?: number | null
+          target_amount?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
@@ -255,6 +341,7 @@ export type Database = {
           date: string
           description: string | null
           id: string
+          savings_goal_id: string | null
           tags: string[] | null
           user_id: string
         }
@@ -265,6 +352,7 @@ export type Database = {
           date: string
           description?: string | null
           id?: string
+          savings_goal_id?: string | null
           tags?: string[] | null
           user_id: string
         }
@@ -275,15 +363,30 @@ export type Database = {
           date?: string
           description?: string | null
           id?: string
+          savings_goal_id?: string | null
           tags?: string[] | null
           user_id?: string
         }
         Relationships: [
           {
+            foreignKeyName: "fk_transactions_savings_goals"
+            columns: ["savings_goal_id"]
+            isOneToOne: false
+            referencedRelation: "savings_goals"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "transactions_category_id_fkey"
             columns: ["category_id"]
             isOneToOne: false
             referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_savings_goal_id_fkey"
+            columns: ["savings_goal_id"]
+            isOneToOne: false
+            referencedRelation: "savings_goals"
             referencedColumns: ["id"]
           },
           {

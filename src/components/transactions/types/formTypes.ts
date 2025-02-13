@@ -5,6 +5,7 @@ export interface TransactionFormValues {
   amount: number;
   category_id: string | null;
   tags: string[];
+  savings_goal_id: string | null;
 }
 
 export interface TransactionFormProps {

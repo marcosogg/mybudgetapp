@@ -1,57 +1,73 @@
 
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { Toaster } from "@/components/ui/sonner";
+import { Suspense, lazy } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "@/providers/AuthProvider";
+import { BrowserRouter, useRoutes } from "react-router-dom";
 import { MonthProvider } from "@/contexts/MonthContext";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { DashboardLayout } from "@/components/layouts/DashboardLayout";
+import { routes } from "@/config/routes";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorBoundary } from "react-error-boundary";
+import { Button } from "@/components/ui/button";
 
-// Pages
-import Dashboard from "@/pages/Dashboard";
-import Transactions from "@/pages/Transactions";
-import Budget from "@/pages/Budget";
-import Income from "@/pages/Income";
-import Reminders from "@/pages/Reminders";
-import Login from "@/pages/Login";
-import SignUp from "@/pages/SignUp";
-import ForgotPassword from "@/pages/ForgotPassword";
-import ResetPassword from "@/pages/ResetPassword";
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30000,
+      gcTime: 1800000,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: 1,
+    },
+  },
+});
 
-const queryClient = new QueryClient();
-
-function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Router>
-        <AuthProvider>
-          <MonthProvider>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              
-              <Route element={<ProtectedRoute />}>
-                <Route element={<DashboardLayout>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/transactions" element={<Transactions />} />
-                    <Route path="/budget" element={<Budget />} />
-                    <Route path="/income" element={<Income />} />
-                    <Route path="/reminders" element={<Reminders />} />
-                  </Routes>
-                </DashboardLayout>} />
-              </Route>
-
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </MonthProvider>
-        </AuthProvider>
-      </Router>
-      <Toaster />
-    </QueryClientProvider>
-  );
+function Routes() {
+  return useRoutes(routes);
 }
+
+const LazyRoutes = lazy(() => Promise.resolve({ default: Routes }));
+
+const LoadingFallback = () => (
+  <div className="p-4">
+    <Skeleton className="h-8 w-[200px] mb-4" />
+    <div className="space-y-4">
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-32 w-full" />
+      <Skeleton className="h-32 w-full" />
+    </div>
+  </div>
+);
+
+const ErrorFallback = ({ error, resetErrorBoundary }: { error: Error; resetErrorBoundary: () => void }) => (
+  <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <h1 className="text-2xl font-bold mb-4">Something went wrong</h1>
+    <p className="text-muted-foreground mb-4">{error.message}</p>
+    <Button onClick={resetErrorBoundary}>Try again</Button>
+  </div>
+);
+
+const AppContent = () => (
+  <ErrorBoundary FallbackComponent={ErrorFallback}>
+    <TooltipProvider>
+      <MonthProvider>
+        <Toaster />
+        <Sonner />
+        <Suspense fallback={<LoadingFallback />}>
+          <LazyRoutes />
+        </Suspense>
+      </MonthProvider>
+    </TooltipProvider>
+  </ErrorBoundary>
+);
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  </QueryClientProvider>
+);
 
 export default App;

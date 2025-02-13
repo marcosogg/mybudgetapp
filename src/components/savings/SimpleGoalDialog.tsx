@@ -6,58 +6,34 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { SavingsGoal, SavingsGoalFormValues } from "@/types/savings";
+import type { SavingsGoalFormValues } from "@/types/savings";
 import { savingsGoalSchema } from "@/types/savings";
 import { useSavingsGoal } from "@/hooks/useSavingsGoal";
 
-interface SavingsGoalDialogProps {
+interface SimpleGoalDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  mode: 'create' | 'edit';
-  goal?: SavingsGoal | null;
 }
 
-export function SavingsGoalDialog({ 
-  open, 
-  onOpenChange,
-  mode,
-  goal
-}: SavingsGoalDialogProps) {
-  const { createGoal, updateGoal, endCurrentGoal } = useSavingsGoal();
+export function SimpleGoalDialog({ open, onOpenChange }: SimpleGoalDialogProps) {
+  const { createGoal } = useSavingsGoal();
 
   const form = useForm<SavingsGoalFormValues>({
     resolver: zodResolver(savingsGoalSchema),
     defaultValues: {
-      name: goal?.name || "",
-      target_amount: goal?.target_amount?.toString() || "",
-      notes: goal?.notes || ""
+      name: "",
+      target_amount: "",
+      notes: ""
     }
   });
 
   const onSubmit = async (values: SavingsGoalFormValues) => {
     try {
-      if (mode === 'edit' && goal) {
-        await updateGoal.mutateAsync({
-          id: goal.id,
-          values
-        });
-      } else {
-        await createGoal.mutateAsync(values);
-      }
+      await createGoal.mutateAsync(values);
       form.reset();
       onOpenChange(false);
     } catch (error) {
-      console.error("Error saving goal:", error);
-    }
-  };
-
-  const handleEndGoal = async () => {
-    if (!goal) return;
-    try {
-      await endCurrentGoal.mutateAsync();
-      onOpenChange(false);
-    } catch (error) {
-      console.error("Error ending goal:", error);
+      console.error("Error creating goal:", error);
     }
   };
 
@@ -65,9 +41,7 @@ export function SavingsGoalDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>
-            {mode === 'edit' ? "Update Savings Goal" : "Create New Savings Goal"}
-          </DialogTitle>
+          <DialogTitle>Create New Savings Goal</DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="space-y-2">
@@ -110,28 +84,13 @@ export function SavingsGoalDialog({
             />
           </div>
 
-          <div className="flex gap-2 justify-end">
-            {mode === 'edit' && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleEndGoal}
-                disabled={endCurrentGoal.isPending}
-              >
-                End Goal
-              </Button>
-            )}
-            <Button
-              type="submit"
-              disabled={createGoal.isPending || updateGoal.isPending}
-            >
-              {createGoal.isPending || updateGoal.isPending
-                ? "Saving..."
-                : mode === 'edit'
-                ? "Update Goal"
-                : "Create Goal"}
-            </Button>
-          </div>
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={createGoal.isPending}
+          >
+            {createGoal.isPending ? "Creating..." : "Create Goal"}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

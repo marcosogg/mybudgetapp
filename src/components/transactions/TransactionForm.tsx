@@ -7,13 +7,12 @@ import { DescriptionField } from "./form/DescriptionField";
 import { AmountField } from "./form/AmountField";
 import { CategoryField } from "./form/CategoryField";
 import { TagsField } from "./form/TagsField";
+import { SavingsGoalField } from "./form/SavingsGoalField";
 import { normalizeTags } from "@/utils/tagUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { useTransactionSubmit } from "./hooks/useTransactionSubmit";
 import { useRealtimeUpdates } from "./hooks/useRealtimeUpdates";
 import { TransactionFormProps, TransactionFormValues } from "./types/formTypes";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 
 export function TransactionForm({ initialData, onSubmit, onCancel }: TransactionFormProps) {
   const form = useForm<TransactionFormValues>({
@@ -23,34 +22,8 @@ export function TransactionForm({ initialData, onSubmit, onCancel }: Transaction
       amount: 0,
       category_id: null,
       tags: [],
+      savings_goal_id: null,
     },
-  });
-
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(form.getValues('category_id'));
-
-  // Fetch active savings goals for tag suggestions
-  const { data: savingsGoals } = useQuery({
-    queryKey: ['savings-goals-tags', selectedCategory],
-    queryFn: async () => {
-      if (!selectedCategory) return [];
-      
-      // Get the savings category
-      const { data: savingsCategory } = await supabase
-        .from('categories')
-        .select('id')
-        .eq('name', 'Savings')
-        .maybeSingle();
-
-      if (savingsCategory?.id !== selectedCategory) return [];
-
-      const { data: goals } = await supabase
-        .from('savings_goals')
-        .select('tag')
-        .not('tag', 'is', null);
-
-      return goals?.map(goal => goal.tag).filter(Boolean) || [];
-    },
-    enabled: !!selectedCategory
   });
 
   const { handleMapping } = useTransactionSubmit();
@@ -68,7 +41,7 @@ export function TransactionForm({ initialData, onSubmit, onCancel }: Transaction
       console.error("Error managing mapping:", error);
     }
 
-    // Ensure amount is negative for expenses
+    // Ensure amount is negative
     const amount = values.amount > 0 ? -values.amount : values.amount;
     onSubmit({ ...values, amount, tags: normalizedTags });
   };
@@ -79,15 +52,9 @@ export function TransactionForm({ initialData, onSubmit, onCancel }: Transaction
         <DateField form={form} />
         <DescriptionField form={form} />
         <AmountField form={form} />
-        <CategoryField 
-          form={form} 
-          mode={initialData ? "edit" : "add"} 
-          onCategoryChange={(categoryId) => setSelectedCategory(categoryId)}
-        />
-        <TagsField 
-          form={form} 
-          suggestedTags={savingsGoals} 
-        />
+        <CategoryField form={form} mode={initialData ? "edit" : "add"} />
+        <TagsField form={form} />
+        <SavingsGoalField form={form} />
 
         <div className="flex justify-end space-x-2">
           <Button type="button" variant="outline" onClick={onCancel}>

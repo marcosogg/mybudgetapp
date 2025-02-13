@@ -1,4 +1,3 @@
-
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
@@ -10,10 +9,9 @@ import { normalizeTags, getTagStyle } from "@/utils/tagUtils";
 
 interface TagsFieldProps {
   form: UseFormReturn<TransactionFormValues>;
-  suggestedTags?: string[];
 }
 
-export const TagsField = ({ form, suggestedTags = [] }: TagsFieldProps) => {
+export const TagsField = ({ form }: TagsFieldProps) => {
   const removeTag = (tagToRemove: string) => {
     const currentTags = form.getValues('tags');
     form.setValue('tags', currentTags.filter(tag => tag !== tagToRemove));
@@ -35,13 +33,6 @@ export const TagsField = ({ form, suggestedTags = [] }: TagsFieldProps) => {
         
         input.value = '';
       }
-    }
-  };
-
-  const addSuggestedTag = (tag: string) => {
-    const currentTags = form.getValues('tags');
-    if (!currentTags.includes(tag)) {
-      form.setValue('tags', [...currentTags, tag]);
     }
   };
 
@@ -78,28 +69,6 @@ export const TagsField = ({ form, suggestedTags = [] }: TagsFieldProps) => {
                 );
               })}
             </div>
-            {suggestedTags && suggestedTags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                <span className="text-sm text-muted-foreground">Suggested tags:</span>
-                {suggestedTags
-                  .filter(tag => !field.value.includes(tag))
-                  .map((tag) => {
-                    const style = getTagStyle(tag);
-                    const Icon = style.icon;
-                    return (
-                      <Badge
-                        key={tag}
-                        variant="outline"
-                        className={`cursor-pointer flex items-center gap-1 hover:${style.bg} ${style.text}`}
-                        onClick={() => addSuggestedTag(tag)}
-                      >
-                        <Icon className="h-3 w-3" />
-                        {tag}
-                      </Badge>
-                    );
-                  })}
-              </div>
-            )}
             <FormControl>
               <Input
                 placeholder="Type a tag and press Enter or comma"
