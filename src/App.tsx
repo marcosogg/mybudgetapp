@@ -33,13 +33,15 @@ function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               
               <Route element={<ProtectedRoute />}>
-                <Route element={<DashboardLayout />}>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/transactions" element={<Transactions />} />
-                  <Route path="/budget" element={<Budget />} />
-                  <Route path="/income" element={<Income />} />
-                  <Route path="/reminders" element={<Reminders />} />
-                </Route>
+                <Route element={<DashboardLayout>
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/transactions" element={<Transactions />} />
+                    <Route path="/budget" element={<Budget />} />
+                    <Route path="/income" element={<Income />} />
+                    <Route path="/reminders" element={<Reminders />} />
+                  </Routes>
+                </DashboardLayout>} />
               </Route>
 
               <Route path="*" element={<Navigate to="/" replace />} />
