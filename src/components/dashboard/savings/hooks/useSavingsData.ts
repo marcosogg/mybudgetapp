@@ -31,53 +31,10 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
     return { 
       monthlyData: [], 
       yearTotal: 0,
-      currentGoal: null,
       averageMonthlySavings: 0,
-      goalProgress: 0,
       projections: []
     };
   }
-
-  // Get current savings goal - get the most recent one
-  const { data: goalData, error: goalError } = await supabase
-    .from("savings_goals")
-    .select("*")
-    .eq("user_id", user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (goalError) {
-    console.error("Error fetching savings goal:", goalError);
-    return { 
-      monthlyData: [], 
-      yearTotal: 0,
-      currentGoal: null,
-      averageMonthlySavings: 0,
-      goalProgress: 0,
-      projections: []
-    };
-  }
-
-  const currentGoal = goalData ? {
-    id: goalData.id,
-    user_id: goalData.user_id,
-    name: goalData.name,
-    goal_type: goalData.goal_type || 'custom', // Default to 'custom' if not set
-    target_amount: Number(goalData.target_amount),
-    recurring_amount: goalData.recurring_amount ? Number(goalData.recurring_amount) : undefined,
-    period_start: goalData.period_start ? new Date(goalData.period_start) : undefined,
-    period_end: goalData.period_end ? new Date(goalData.period_end) : undefined,
-    notes: goalData.notes,
-    progress: Number(goalData.progress || 0),
-    created_at: new Date(goalData.created_at),
-    updated_at: new Date(goalData.updated_at),
-    streak_count: Number(goalData.streak_count || 0),
-    last_contribution_date: goalData.last_contribution_date ? new Date(goalData.last_contribution_date) : undefined,
-    best_month_amount: goalData.best_month_amount ? Number(goalData.best_month_amount) : undefined,
-    best_month_date: goalData.best_month_date ? new Date(goalData.best_month_date) : undefined,
-    milestone_notifications: goalData.milestone_notifications ?? true
-  } : null;
 
   // Get this year's savings data
   const startDate = startOfYear(new Date());
@@ -122,13 +79,9 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
   }, {...monthsMap}); // Start with all months initialized to 0
 
   Object.entries(monthlyAmounts || {}).forEach(([month, amount]) => {
-    const monthlyGoalAmount = currentGoal?.target_amount ? currentGoal.target_amount / 12 : 0;
-    
     monthlyData.push({
       month,
       amount,
-      goal_amount: monthlyGoalAmount,
-      percentage_of_goal: monthlyGoalAmount ? (amount / monthlyGoalAmount) * 100 : 0,
       trend_indicator: calculateTrendIndicator(amount, previousAmount),
       is_negative: amount < 0
     });
@@ -138,9 +91,6 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
 
   const yearTotal = monthlyData.reduce((sum, month) => sum + month.amount, 0);
   const averageMonthlySavings = yearTotal / monthlyData.length || 0;
-  const goalProgress = currentGoal 
-    ? (yearTotal / currentGoal.target_amount) * 100 
-    : 0;
 
   // Calculate projections based on historical data
   const projections = calculateProjections(monthlyData);
@@ -148,9 +98,7 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
   return { 
     monthlyData, 
     yearTotal,
-    currentGoal,
     averageMonthlySavings,
-    goalProgress,
     projections
   };
 }
