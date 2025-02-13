@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/tooltip";
 import { useSavingsData } from "./hooks/useSavingsData";
 import { SavingsChartTooltip } from "./SavingsChartTooltip";
-import { SavingsMetricsCards } from "./SavingsMetricsCards";
 import { CHART_CONSTANTS } from "./utils/constants";
 
 export function SavingsChart() {
@@ -45,7 +44,7 @@ export function SavingsChart() {
     : 0;
 
   return (
-    <Card className="p-6 space-y-4">
+    <Card className="p-6">
       <div className="flex flex-col space-y-2 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
         <div className="space-y-1">
           <h3 className="text-lg font-semibold">Monthly Savings</h3>
@@ -69,7 +68,7 @@ export function SavingsChart() {
         </div>
       </div>
 
-      <div className="h-[300px] w-full">
+      <div className="h-[300px] w-full mt-4">
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={allData} margin={CHART_CONSTANTS.MARGIN}>
             <XAxis 
@@ -126,14 +125,6 @@ export function SavingsChart() {
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-      
-      {savingsData && (
-        <SavingsMetricsCards
-          yearTotal={savingsData.yearTotal}
-          averageMonthlySavings={savingsData.averageMonthlySavings}
-          goalProgress={savingsData.goalProgress}
-        />
-      )}
     </Card>
   );
 }
