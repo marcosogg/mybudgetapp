@@ -293,6 +293,7 @@ export type Database = {
           progress: number
           recurring_amount: number | null
           streak_count: number | null
+          tag: string | null
           target_amount: number
           updated_at: string
           user_id: string
@@ -310,6 +311,7 @@ export type Database = {
           progress?: number
           recurring_amount?: number | null
           streak_count?: number | null
+          tag?: string | null
           target_amount: number
           updated_at?: string
           user_id: string
@@ -327,6 +329,7 @@ export type Database = {
           progress?: number
           recurring_amount?: number | null
           streak_count?: number | null
+          tag?: string | null
           target_amount?: number
           updated_at?: string
           user_id?: string
