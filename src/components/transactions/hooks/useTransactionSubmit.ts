@@ -1,4 +1,3 @@
-
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,6 +13,7 @@ export const useTransactionSubmit = () => {
     userId: string
   ) => {
     if (!description || !categoryId) {
+      // Skip mapping creation if either description or categoryId is missing/null
       return;
     }
 
@@ -51,7 +51,6 @@ export const useTransactionSubmit = () => {
 
       await queryClient.invalidateQueries({ queryKey: ["mappings"] });
       await queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      await queryClient.invalidateQueries({ queryKey: ["savings-goals"] });
     } catch (error: any) {
       console.error("Error managing mapping:", error);
       toast({
