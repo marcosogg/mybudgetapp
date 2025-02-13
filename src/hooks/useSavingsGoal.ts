@@ -53,12 +53,13 @@ export function useSavingsGoal() {
 
       if (!category) return null;
 
-      // Get total savings amount
+      // Get total savings amount for this goal's tag
       const { data: transactions } = await supabase
         .from("transactions")
         .select("amount")
         .eq("category_id", category.id)
-        .eq("user_id", user.id);
+        .eq("user_id", user.id)
+        .contains('tags', [currentGoal.tag]);
 
       const currentAmount = transactions?.reduce(
         (sum, t) => sum + Math.abs(t.amount || 0),
@@ -79,7 +80,7 @@ export function useSavingsGoal() {
 
   // Create goal mutation
   const createGoal = useMutation({
-    mutationFn: async (values: SavingsGoalFormValues) => {
+    mutationFn: async (values: SavingsGoalFormValues & { tag: string }) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
@@ -90,6 +91,7 @@ export function useSavingsGoal() {
           name: values.name,
           target_amount: parseFloat(values.target_amount),
           notes: values.notes,
+          tag: values.tag,
           progress: 0
         })
         .select()
@@ -111,13 +113,14 @@ export function useSavingsGoal() {
 
   // Update goal mutation
   const updateGoal = useMutation({
-    mutationFn: async ({ id, values }: { id: string; values: SavingsGoalFormValues }) => {
+    mutationFn: async ({ id, values }: { id: string; values: SavingsGoalFormValues & { tag: string } }) => {
       const { data, error } = await supabase
         .from("savings_goals")
         .update({
           name: values.name,
           target_amount: parseFloat(values.target_amount),
-          notes: values.notes
+          notes: values.notes,
+          tag: values.tag
         })
         .eq('id', id)
         .select()

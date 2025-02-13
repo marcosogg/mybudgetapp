@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { SavingsGoal, SavingsGoalFormValues } from "@/types/savings";
 import { savingsGoalSchema } from "@/types/savings";
 import { useSavingsGoal } from "@/hooks/useSavingsGoal";
+import { normalizeTags } from "@/utils/tagUtils";
 
 interface SavingsGoalDialogProps {
   open: boolean;
@@ -36,13 +37,22 @@ export function SavingsGoalDialog({
 
   const onSubmit = async (values: SavingsGoalFormValues) => {
     try {
+      // Generate tag from goal name
+      const normalizedTag = normalizeTags(values.name)[0];
+      
       if (mode === 'edit' && goal) {
         await updateGoal.mutateAsync({
           id: goal.id,
-          values
+          values: {
+            ...values,
+            tag: normalizedTag
+          }
         });
       } else {
-        await createGoal.mutateAsync(values);
+        await createGoal.mutateAsync({
+          ...values,
+          tag: normalizedTag
+        });
       }
       form.reset();
       onOpenChange(false);

@@ -1,3 +1,4 @@
+
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { UseFormReturn } from "react-hook-form";
@@ -8,9 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 interface CategoryFieldProps {
   form: UseFormReturn<TransactionFormValues>;
   mode?: "add" | "edit";
+  onCategoryChange?: (categoryId: string | null) => void;
 }
 
-export const CategoryField = ({ form, mode = "add" }: CategoryFieldProps) => {
+export const CategoryField = ({ form, mode = "add", onCategoryChange }: CategoryFieldProps) => {
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -23,6 +25,11 @@ export const CategoryField = ({ form, mode = "add" }: CategoryFieldProps) => {
     },
   });
 
+  const handleCategoryChange = (value: string) => {
+    form.setValue('category_id', value === 'null' ? null : value);
+    onCategoryChange?.(value === 'null' ? null : value);
+  };
+
   return (
     <FormField
       control={form.control}
@@ -31,7 +38,7 @@ export const CategoryField = ({ form, mode = "add" }: CategoryFieldProps) => {
         <FormItem>
           <FormLabel>Category</FormLabel>
           <Select
-            onValueChange={field.onChange}
+            onValueChange={handleCategoryChange}
             defaultValue={field.value || "null"}
           >
             <FormControl>
