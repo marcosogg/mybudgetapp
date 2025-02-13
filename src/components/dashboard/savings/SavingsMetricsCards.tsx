@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 interface SavingsMetricsProps {
   yearTotal: number;
   averageMonthlySavings: number;
-  goalProgress: number;
+  goalProgress: number | undefined;
 }
 
 export function SavingsMetricsCards({
@@ -26,8 +26,8 @@ export function SavingsMetricsCards({
       <Card className="p-4">
         <p className="text-sm text-muted-foreground">Goal Progress</p>
         <div className="flex items-end gap-2">
-          <p className="text-2xl font-bold">{goalProgress.toFixed(1)}%</p>
-          {goalProgress >= 100 && (
+          <p className="text-2xl font-bold">{goalProgress ? goalProgress.toFixed(1) : '0.0'}%</p>
+          {goalProgress && goalProgress >= 100 && (
             <Badge variant="default" className="mb-1">Achieved!</Badge>
           )}
         </div>
