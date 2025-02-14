@@ -23,9 +23,12 @@ import { useSavingsData } from "./hooks/useSavingsData";
 import { SavingsChartTooltip } from "./SavingsChartTooltip";
 import { SavingsMetricsCards } from "./SavingsMetricsCards";
 import { CHART_CONSTANTS } from "./utils/constants";
+import { useState } from "react";
+import { SimpleGoalDialog } from "@/components/savings/SimpleGoalDialog";
 
 export function SavingsChart() {
   const { data: savingsData, isLoading } = useSavingsData();
+  const [isGoalDialogOpen, setIsGoalDialogOpen] = useState(false);
 
   if (isLoading) {
     return <Skeleton className="h-[350px] w-full" data-testid="skeleton" />;
@@ -132,8 +135,16 @@ export function SavingsChart() {
           yearTotal={savingsData.yearTotal}
           averageMonthlySavings={savingsData.averageMonthlySavings}
           goalProgress={savingsData.goalProgress}
+          hasGoal={!!savingsData.currentGoal}
+          onSetGoal={() => setIsGoalDialogOpen(true)}
         />
       )}
+
+      <SimpleGoalDialog
+        open={isGoalDialogOpen}
+        onOpenChange={setIsGoalDialogOpen}
+        currentGoal={savingsData?.currentGoal || undefined}
+      />
     </Card>
   );
 }
