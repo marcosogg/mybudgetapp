@@ -25,6 +25,7 @@ import { SavingsMetricsCards } from "./SavingsMetricsCards";
 import { CHART_CONSTANTS } from "./utils/constants";
 import { useState } from "react";
 import { SimpleGoalDialog } from "@/components/savings/SimpleGoalDialog";
+import { Separator } from "@/components/ui/separator";
 
 export function SavingsChart() {
   const { data: savingsData, isLoading } = useSavingsData();
@@ -48,28 +49,14 @@ export function SavingsChart() {
     : 0;
 
   return (
-    <Card className="p-6 space-y-4">
-      <div className="flex flex-col space-y-2 sm:flex-row sm:justify-between sm:items-center sm:space-y-0">
-        <div className="space-y-1">
-          <h3 className="text-lg font-semibold">Monthly Savings</h3>
-          <p className="text-sm text-muted-foreground">Track your savings progress</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Badge variant={savingsData?.goalProgress && savingsData.goalProgress >= 100 ? "default" : "secondary"}>
-            {savingsData?.goalProgress?.toFixed(1)}% of Goal
+    <Card className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-lg font-semibold">Savings Trend</h3>
+        {savingsData?.currentGoal && (
+          <Badge variant={savingsData.goalProgress >= 100 ? "default" : "secondary"}>
+            {savingsData.goalProgress.toFixed(1)}% of Goal
           </Badge>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Info className="h-4 w-4 text-muted-foreground" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Year Total: ${savingsData?.yearTotal?.toLocaleString()}</p>
-                <p>Monthly Avg: ${savingsData?.averageMonthlySavings?.toLocaleString()}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+        )}
       </div>
 
       <div className="h-[300px] w-full">
@@ -129,6 +116,8 @@ export function SavingsChart() {
           </ComposedChart>
         </ResponsiveContainer>
       </div>
+      
+      <Separator className="my-6" />
       
       {savingsData && (
         <SavingsMetricsCards
