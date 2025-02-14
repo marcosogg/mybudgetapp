@@ -250,42 +250,66 @@ export type Database = {
       savings_goals: {
         Row: {
           created_at: string
-          goal_type: string
           id: string
           name: string
-          notes: string | null
-          period_end: string | null
-          period_start: string
-          progress: number | null
-          recurring_amount: number | null
           target_amount: number
           user_id: string
         }
         Insert: {
           created_at?: string
-          goal_type: string
           id?: string
           name: string
-          notes?: string | null
-          period_end?: string | null
-          period_start: string
-          progress?: number | null
-          recurring_amount?: number | null
           target_amount: number
           user_id: string
         }
         Update: {
           created_at?: string
-          goal_type?: string
           id?: string
           name?: string
-          notes?: string | null
-          period_end?: string | null
-          period_start?: string
-          progress?: number | null
-          recurring_amount?: number | null
           target_amount?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      savings_goals_backup: {
+        Row: {
+          created_at: string | null
+          goal_type: string | null
+          id: string | null
+          name: string | null
+          notes: string | null
+          period_end: string | null
+          period_start: string | null
+          progress: number | null
+          recurring_amount: number | null
+          target_amount: number | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          goal_type?: string | null
+          id?: string | null
+          name?: string | null
+          notes?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          progress?: number | null
+          recurring_amount?: number | null
+          target_amount?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          goal_type?: string | null
+          id?: string | null
+          name?: string | null
+          notes?: string | null
+          period_end?: string | null
+          period_start?: string | null
+          progress?: number | null
+          recurring_amount?: number | null
+          target_amount?: number | null
+          user_id?: string | null
         }
         Relationships: []
       }

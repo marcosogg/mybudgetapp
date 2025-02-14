@@ -27,12 +27,21 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
     .eq("name", "Savings")
     .single();
 
+  // Get current savings goal
+  const { data: currentGoal } = await supabase
+    .from("savings_goals")
+    .select("*")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
   if (!savingsCategory) {
     return { 
       monthlyData: [], 
       yearTotal: 0,
       averageMonthlySavings: 0,
-      projections: []
+      projections: [],
+      currentGoal: null,
+      goalProgress: 0
     };
   }
 
@@ -92,6 +101,12 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
   const yearTotal = monthlyData.reduce((sum, month) => sum + month.amount, 0);
   const averageMonthlySavings = yearTotal / monthlyData.length || 0;
 
+  // Calculate goal progress if a goal exists
+  let goalProgress = 0;
+  if (currentGoal) {
+    goalProgress = (yearTotal / currentGoal.target_amount) * 100;
+  }
+
   // Calculate projections based on historical data
   const projections = calculateProjections(monthlyData);
 
@@ -99,7 +114,9 @@ async function fetchSavingsData(): Promise<SavingsChartData> {
     monthlyData, 
     yearTotal,
     averageMonthlySavings,
-    projections
+    projections,
+    currentGoal,
+    goalProgress
   };
 }
 
