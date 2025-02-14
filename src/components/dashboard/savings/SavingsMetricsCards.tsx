@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Edit2, Plus } from "lucide-react";
 
 interface SavingsMetricsProps {
   yearTotal: number;
@@ -34,9 +34,20 @@ export function SavingsMetricsCards({
           <div>
             <p className="text-sm text-muted-foreground">Goal Progress</p>
             {hasGoal ? (
-              <div className="flex items-end gap-2">
-                <p className="font-bold text-xl">{goalProgress ? goalProgress.toFixed(1) : '0.0'}%</p>
-                {goalProgress && goalProgress >= 100 && <Badge variant="default" className="mb-1">Achieved!</Badge>}
+              <div className="space-y-2">
+                <div className="flex items-end gap-2">
+                  <p className="font-bold text-xl">{goalProgress ? goalProgress.toFixed(1) : '0.0'}%</p>
+                  {goalProgress && goalProgress >= 100 && <Badge variant="default" className="mb-1">Achieved!</Badge>}
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={onSetGoal}
+                  className="w-full"
+                >
+                  <Edit2 className="h-4 w-4 mr-1" />
+                  Edit Goal
+                </Button>
               </div>
             ) : (
               <Button 
