@@ -8,5 +8,4 @@ export const ROUTES = {
   BUDGET: '/budget',
   REMINDERS: '/reminders',
   SETTINGS: '/settings',
-  SAVINGS_GOALS: '/savings-goals',
 } as const;

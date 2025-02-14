@@ -1,4 +1,5 @@
-import { Home, PieChart, List, Bell, Wallet, Target } from "lucide-react";
+
+import { Home, PieChart, List, Bell, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -26,7 +27,6 @@ export const Sidebar = () => {
     { name: "Dashboard", href: ROUTES.HOME, icon: Home },
     { name: "Transactions", href: ROUTES.TRANSACTIONS, icon: List },
     { name: "Budget", href: ROUTES.BUDGET, icon: Wallet },
-    { name: "Savings Goals", href: ROUTES.SAVINGS_GOALS, icon: Target },
   ];
 
   const handleLogout = async () => {

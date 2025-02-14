@@ -13,7 +13,6 @@ import TransactionImport from "@/pages/TransactionImport";
 import Budget from "@/pages/Budget";
 import Reminders from "@/pages/Reminders";
 import Settings from "@/pages/Settings";
-import SavingsGoals from "@/pages/SavingsGoals";
 import NotFound from "@/pages/NotFound";
 
 export const routes: RouteObject[] = [
@@ -74,14 +73,6 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <Settings />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: ROUTES.SAVINGS_GOALS,
-    element: (
-      <ProtectedRoute>
-        <SavingsGoals />
       </ProtectedRoute>
     ),
   },
