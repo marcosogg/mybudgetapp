@@ -2,8 +2,18 @@
 import { useEffect } from 'react';
 import { useProfile } from '@/hooks/useProfile';
 import { supabase } from '@/integrations/supabase/client';
+import type { IntercomSettings } from '@/types/intercom';
 
 const INTERCOM_APP_ID = 'dhcwev5z';
+
+declare global {
+  interface Window {
+    Intercom?: {
+      (command: 'boot' | 'update' | 'show' | 'hide' | 'shutdown', settings?: IntercomSettings): void;
+      booted: boolean;
+    };
+  }
+}
 
 export function IntercomProvider({ children }: { children: React.ReactNode }) {
   const { profile } = useProfile();

@@ -163,6 +163,7 @@ export type Database = {
           email: string
           email_notifications_enabled: boolean | null
           id: string
+          intercom_enabled: boolean | null
           name: string | null
           statement_format:
             | Database["public"]["Enums"]["statement_format"]
@@ -174,6 +175,7 @@ export type Database = {
           email: string
           email_notifications_enabled?: boolean | null
           id: string
+          intercom_enabled?: boolean | null
           name?: string | null
           statement_format?:
             | Database["public"]["Enums"]["statement_format"]
@@ -185,6 +187,7 @@ export type Database = {
           email?: string
           email_notifications_enabled?: boolean | null
           id?: string
+          intercom_enabled?: boolean | null
           name?: string | null
           statement_format?:
             | Database["public"]["Enums"]["statement_format"]

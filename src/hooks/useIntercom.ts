@@ -1,6 +1,7 @@
 
 import { useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import type { IntercomSettings } from '@/types/intercom';
 
 export const useIntercom = () => {
   const { toast } = useToast();
