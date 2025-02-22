@@ -10,6 +10,7 @@ import { routes } from "@/config/routes";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorBoundary } from "react-error-boundary";
 import { Button } from "@/components/ui/button";
+import { IntercomProvider } from "@/components/providers/IntercomProvider";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -52,11 +53,13 @@ const AppContent = () => (
   <ErrorBoundary FallbackComponent={ErrorFallback}>
     <TooltipProvider>
       <MonthProvider>
-        <Toaster />
-        <Sonner />
-        <Suspense fallback={<LoadingFallback />}>
-          <LazyRoutes />
-        </Suspense>
+        <IntercomProvider>
+          <Toaster />
+          <Sonner />
+          <Suspense fallback={<LoadingFallback />}>
+            <LazyRoutes />
+          </Suspense>
+        </IntercomProvider>
       </MonthProvider>
     </TooltipProvider>
   </ErrorBoundary>
