@@ -7,7 +7,6 @@ import { DescriptionField } from "./form/DescriptionField";
 import { AmountField } from "./form/AmountField";
 import { CategoryField } from "./form/CategoryField";
 import { TagsField } from "./form/TagsField";
-import { SavingsGoalField } from "./form/SavingsGoalField";
 import { normalizeTags } from "@/utils/tagUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { useTransactionSubmit } from "./hooks/useTransactionSubmit";
@@ -22,7 +21,6 @@ export function TransactionForm({ initialData, onSubmit, onCancel }: Transaction
       amount: 0,
       category_id: null,
       tags: [],
-      savings_goal_id: null,
     },
   });
 
@@ -54,7 +52,6 @@ export function TransactionForm({ initialData, onSubmit, onCancel }: Transaction
         <AmountField form={form} />
         <CategoryField form={form} mode={initialData ? "edit" : "add"} />
         <TagsField form={form} />
-        <SavingsGoalField form={form} />
 
         <div className="flex justify-end space-x-2">
           <Button type="button" variant="outline" onClick={onCancel}>

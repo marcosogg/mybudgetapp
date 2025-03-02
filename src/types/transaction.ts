@@ -1,3 +1,4 @@
+
 export interface Transaction {
   id: string;
   user_id: string;
@@ -6,7 +7,6 @@ export interface Transaction {
   amount: number;
   category_id: string | null;
   tags: string[] | null;
-  savings_goal_id: string | null;
   category?: {
     name: string;
   } | null;
@@ -19,7 +19,6 @@ export interface TransactionFormValues {
   amount: string;
   category_id?: string;
   tags?: string[];
-  savings_goal_id?: string | null;
 }
 
 // Utility type for transaction statistics
