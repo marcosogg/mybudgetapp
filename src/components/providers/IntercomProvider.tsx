@@ -6,15 +6,6 @@ import type { IntercomSettings } from '@/types/intercom';
 
 const INTERCOM_APP_ID = 'dhcwev5z';
 
-declare global {
-  interface Window {
-    Intercom?: {
-      (command: 'boot' | 'update' | 'show' | 'hide' | 'shutdown', settings?: IntercomSettings): void;
-      booted: boolean;
-    };
-  }
-}
-
 export function IntercomProvider({ children }: { children: React.ReactNode }) {
   const { profile } = useProfile();
 
@@ -42,6 +33,7 @@ export function IntercomProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user && profile) {
         window.Intercom?.('update', {
+          app_id: INTERCOM_APP_ID,
           name: profile.name,
           email: profile.email,
           user_id: session.user.id,

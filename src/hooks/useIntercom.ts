@@ -24,7 +24,7 @@ export const useIntercom = () => {
     }
   }, []);
 
-  const updateSettings = useCallback((settings: Partial<IntercomSettings>) => {
+  const updateSettings = useCallback((settings: Partial<IntercomSettings> & { app_id: string }) => {
     if (window.Intercom) {
       window.Intercom('update', settings);
     }

@@ -94,7 +94,6 @@ export const WiseParser: StatementParser = {
       amount: parseFloat(parsedTransaction.amount),
       tags: [],
       category_id: null,
-      savings_goal_id: null, // Add this field with null as default
     };
   }
 };

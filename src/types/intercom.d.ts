@@ -1,5 +1,5 @@
 
-interface IntercomSettings {
+export interface IntercomSettings {
   app_id: string;
   name?: string;
   email?: string;
@@ -7,16 +7,11 @@ interface IntercomSettings {
   created_at?: number;
 }
 
-interface IntercomWindow extends Window {
-  intercomSettings?: IntercomSettings;
-  Intercom?: {
-    (...args: any[]): void;
-    booted: boolean;
-  };
-}
-
 declare global {
-  interface Window extends IntercomWindow {}
+  interface Window {
+    Intercom?: {
+      (command: 'boot' | 'update' | 'show' | 'hide' | 'shutdown', settings?: IntercomSettings): void;
+      booted: boolean;
+    };
+  }
 }
-
-export type { IntercomSettings, IntercomWindow };

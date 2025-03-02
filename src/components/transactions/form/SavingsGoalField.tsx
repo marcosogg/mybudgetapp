@@ -17,8 +17,10 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { TransactionFormValues } from "../types/formTypes";
 
+// Note: This component is no longer used since savings_goal_id has been removed
+// This is kept for reference only but should be considered deprecated
 interface SavingsGoalFieldProps {
-  form: UseFormReturn<TransactionFormValues>;
+  form: UseFormReturn<TransactionFormValues & { savings_goal_id?: string }>;
 }
 
 export function SavingsGoalField({ form }: SavingsGoalFieldProps) {
@@ -39,33 +41,13 @@ export function SavingsGoalField({ form }: SavingsGoalFieldProps) {
     }
   });
 
+  // This component is deprecated and should not be used
+  // It remains only for reference
+  console.warn('SavingsGoalField is deprecated and should not be used');
+  
   return (
-    <FormField
-      control={form.control}
-      name="savings_goal_id"
-      render={({ field }) => (
-        <FormItem>
-          <FormLabel>Savings Goal</FormLabel>
-          <Select
-            onValueChange={field.onChange}
-            value={field.value || ""}
-          >
-            <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a savings goal" />
-              </SelectTrigger>
-            </FormControl>
-            <SelectContent>
-              <SelectItem value="">None</SelectItem>
-              {goals?.map((goal) => (
-                <SelectItem key={goal.id} value={goal.id}>
-                  {goal.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </FormItem>
-      )}
-    />
+    <div className="hidden">
+      {/* Component hidden and not functional */}
+    </div>
   );
 }

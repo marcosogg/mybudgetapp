@@ -46,7 +46,6 @@ export const RevolutParser: StatementParser = {
       amount,
       tags: [],
       category_id: null,
-      savings_goal_id: null, // Add this field with null as default
     };
   }
 };
